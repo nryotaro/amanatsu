@@ -47,7 +47,7 @@ public class HellowNetty {
                 public void initChannel(SocketChannel ch) throws Exception {
                     ChannelPipeline pl = ch.pipeline();
                     pl.addLast("decoder", new HttpResponseDecoder());
-                    pl.addLast("encoder", new HttpResponseEncoder());
+                    pl.addLast("encoder", new HttpRequestEncoder());
                     ch.pipeline().addLast(new TimeClientHandler());
                 }
             });
