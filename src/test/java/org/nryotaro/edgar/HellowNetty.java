@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import org.junit.Test;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -46,15 +47,20 @@ public class HellowNetty {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     ChannelPipeline pl = ch.pipeline();
+                    pl.addLast("codec", new HttpClientCodec());
+                    /*
                     pl.addLast("decoder", new HttpResponseDecoder());
                     pl.addLast("encoder", new HttpRequestEncoder());
-                    ch.pipeline().addLast(new TimeClientHandler());
+                    */
+                    pl.addLast(new TimeClientHandler());
                 }
             });
             Channel f = b.connect("localhost", 8080).sync().channel(); // (5)
 
+            URI url = new URI("http://localhost:8080/");
             HttpRequest postReq = new DefaultHttpRequest(HttpVersion.HTTP_1_1,
-                    HttpMethod.GET, "localhost");
+                    HttpMethod.GET, url.getRawPath());
+
             /*
             postReq.headers().set(HttpHeaders.Names.HOST, "localhost");
             postReq.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
@@ -68,44 +74,15 @@ public class HellowNetty {
 
     }
 }
-/*
-@ChannelHandler.Sharable
-public class EchoClientHandler extends
-        SimpleChannelInboundHandler<ByteBuf> {
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-        ctx.writeAndFlush(Unpooled.copiedBuffer("Netty rocks!",
-                CharsetUtil.UTF_8);
-    }
-    @Override
-    public void channelRead0(ChannelHandlerContext ctx, ByteBuf in) {
-        System.out.println(
-                "Client received: " + in.toString(CharsetUtil.UTF_8));
-    }
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx,
-                                Throwable cause) {
-        cause.printStackTrace();
-        ctx.close();
-    }
-
-    @Override
-    protected void messageReceived(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) throws Exception {
-
-    }
-}
-*/
 
 class TimeClientHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        ByteBuf m = (ByteBuf) msg; // (1)
         try {
-            long currentTimeMillis = (m.readUnsignedInt() - 2208988800L) * 1000L;
-            System.out.println(new Date(currentTimeMillis));
+            System.out.println(msg);
             ctx.close();
         } finally {
-            m.release();
+        //    m.release();
         }
     }
 
