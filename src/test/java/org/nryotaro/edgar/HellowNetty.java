@@ -13,9 +13,27 @@ import io.netty.util.CharsetUtil;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class HellowNetty {
 
+    @Test
+    public void test() throws Exception {
+
+        ExecutorService exec = Executors.newSingleThreadExecutor();
+
+        Future<String> str2 = exec.submit(() -> "drop");
+        Future<String> str =
+                exec.submit(() -> "hoge");
+
+
+        String bar = "render";
+        String s = str.get() + bar + str2.get();
+        System.out.print("");
+    }
 
     @Test
     public void helloTest() throws Exception {
@@ -27,8 +45,9 @@ public class HellowNetty {
             b.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-                    new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "localhost");
-
+                    ChannelPipeline pl = ch.pipeline();
+                    pl.addLast("decoder", new HttpResponseDecoder());
+                    pl.addLast("encoder", new HttpResponseEncoder());
                     ch.pipeline().addLast(new TimeClientHandler());
                 }
             });
