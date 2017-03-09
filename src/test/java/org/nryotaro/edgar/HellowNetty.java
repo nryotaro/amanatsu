@@ -9,6 +9,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.Headers;
 import io.netty.handler.codec.http.*;
 import io.netty.util.CharsetUtil;
 import org.junit.Test;
@@ -66,17 +67,10 @@ public class HellowNetty {
 class TimeClientHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        FullHttpResponse httpResp = (FullHttpResponse) msg;
+        Headers headers =  httpResp.headers();
 
-        if( msg instanceof DefaultHttpResponse) {
-            DefaultHttpResponse resp = (DefaultHttpResponse) msg;
-        } else if (msg instanceof  DefaultLastHttpContent ) {
-            DefaultLastHttpContent resp =  ((DefaultLastHttpContent) msg);
-            ByteBuf buf = resp.content();
-            System.out.println(buf.toString(CharsetUtil.UTF_8));
-
-        }
-
-        System.out.println(msg);
+        System.out.println(httpResp.content().toString(CharsetUtil.UTF_8));
         ctx.close();
     }
 
