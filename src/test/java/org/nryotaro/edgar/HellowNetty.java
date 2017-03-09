@@ -1,6 +1,7 @@
 package org.nryotaro.edgar;
 
 
+import com.sun.xml.internal.ws.api.streaming.XMLStreamReaderFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -22,21 +23,6 @@ import java.util.concurrent.Future;
 public class HellowNetty {
 
     @Test
-    public void test() throws Exception {
-
-        ExecutorService exec = Executors.newSingleThreadExecutor();
-
-        Future<String> str2 = exec.submit(() -> "drop");
-        Future<String> str =
-                exec.submit(() -> "hoge");
-
-
-        String bar = "render";
-        String s = str.get() + bar + str2.get();
-        System.out.print("");
-    }
-
-    @Test
     public void helloTest() throws Exception {
         EventLoopGroup workerGroup  = new NioEventLoopGroup();
         try {
@@ -47,26 +33,28 @@ public class HellowNetty {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
                     ChannelPipeline pl = ch.pipeline();
-                    pl.addLast("codec", new HttpClientCodec());
-                    /*
-                    pl.addLast("decoder", new HttpResponseDecoder());
-                    pl.addLast("encoder", new HttpRequestEncoder());
-                    */
+                    pl.addLast(new HttpClientCodec());
+                    // Remove the following line if you don't want automatic content decompression.
+                    pl.addLast(new HttpContentDecompressor());
+                    pl.addLast(new HttpObjectAggregator(1048576));
                     pl.addLast(new TimeClientHandler());
+
+
                 }
             });
-            Channel f = b.connect("localhost", 8080).sync().channel(); // (5)
 
-            URI url = new URI("http://localhost:8080/");
-            HttpRequest postReq = new DefaultHttpRequest(HttpVersion.HTTP_1_1,
-                    HttpMethod.GET, url.getRawPath());
+            URI uri = new URI("http://localhost:8080");
 
-            /*
-            postReq.headers().set(HttpHeaders.Names.HOST, "localhost");
-            postReq.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
-            postReq.headers().set(HttpHeaders.Names.CONTENT_TYPE,"application/x-www-form-urlencoded");
-            */
-            f.writeAndFlush(postReq);
+            Channel f = b.connect(uri.getHost(),uri.getPort()).sync().channel(); // (5)
+
+            // Prepare the HTTP request.
+            HttpRequest request = new DefaultFullHttpRequest(
+            HttpVersion.HTTP_1_1, HttpMethod.GET, uri.getRawPath());
+            request.headers().set(HttpHeaderNames.HOST, uri.getHost());
+            request.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
+            request.headers().set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP);
+
+            f.writeAndFlush(request);
             f.closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
@@ -78,12 +66,18 @@ public class HellowNetty {
 class TimeClientHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        try {
-            System.out.println(msg);
-            ctx.close();
-        } finally {
-        //    m.release();
+
+        if( msg instanceof DefaultHttpResponse) {
+            DefaultHttpResponse resp = (DefaultHttpResponse) msg;
+        } else if (msg instanceof  DefaultLastHttpContent ) {
+            DefaultLastHttpContent resp =  ((DefaultLastHttpContent) msg);
+            ByteBuf buf = resp.content();
+            System.out.println(buf.toString(CharsetUtil.UTF_8));
+
         }
+
+        System.out.println(msg);
+        ctx.close();
     }
 
     @Override
