@@ -4,6 +4,7 @@ package org.nryotaro.amanatsu;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
+import org.nryotaro.amanatsu.actor.CountingActor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,14 +17,11 @@ import org.springframework.boot.CommandLineRunner;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
-import sun.net.www.http.HttpClient;
-
-import javax.servlet.*;
 
 import java.util.concurrent.TimeUnit;
 
 import static akka.pattern.Patterns.ask;
-import static org.nryotaro.amanatsu.SpringExtension.SpringExtProvider;
+import static org.nryotaro.amanatsu.actor.SpringExtension.SpringExtProvider;
 
 @RestController
 @SpringBootApplication
@@ -35,7 +33,7 @@ public class Edgar {
 
     @RequestMapping("/")
     @ResponseBody
-    public String home(ServletRequest req) {
+    public String home() {
         return "Hello, Spring Boot!";
     }
 
@@ -50,54 +48,38 @@ public class Edgar {
         return new Runner();
     }
 
-    // the application context is needed to initialize the Akka Spring Extension
-    @Autowired
-    private ApplicationContext applicationContext;
+    class Runner implements CommandLineRunner {
 
-    /**
-     * Actor system singleton for this application.
-     */
-    @Bean
-    public ActorSystem actorSystem() {
-        ActorSystem system = ActorSystem.create("AkkaJavaSpring");
-        // initialize the application context in the Akka Spring Extension
-        SpringExtProvider.get(system).initialize(applicationContext);
-        return system;
-    }
+        @Override
+        public void run(String... strings) throws Exception {
+            // get hold of the actor system
 
-class Runner implements CommandLineRunner {
-
-    @Override
-    public void run(String... strings) throws Exception {
-        System.out.println("hoge---");
-        // get hold of the actor system
-
-        ActorSystem system = ctx.getBean(ActorSystem.class);
-        // use the Spring Extension to create props for a named actor bean
-        ActorRef counter = system.actorOf(
-                SpringExtProvider.get(system).props("CountingActor"), "counter");
+            ActorSystem system = ctx.getBean(ActorSystem.class);
+            // use the Spring Extension to create props for a named actor bean
+            ActorRef counter = system.actorOf(
+                    SpringExtProvider.get(system).props("CountingActor"), "counter");
 
 
-        // tell it to count three times
-        counter.tell(new CountingActor.Count(), null);
-        counter.tell(new CountingActor.Count(), null);
-        counter.tell(new CountingActor.Count(), null);
+            // tell it to count three times
+            counter.tell(new CountingActor.Count(), null);
+            counter.tell(new CountingActor.Count(), null);
+            counter.tell(new CountingActor.Count(), null);
 
-        // print the result
-        FiniteDuration duration = FiniteDuration.create(3, TimeUnit.SECONDS);
-        Future<Object> result = ask(counter, new CountingActor.Get(),
-                Timeout.durationToTimeout(duration));
-        try {
-            System.out.println("Got back " + Await.result(result, duration));
-        } catch (Exception e) {
-            System.err.println("Failed getting result: " + e.getMessage());
-            throw e;
-        } finally {
-            system.terminate();
+            // print the result
+            FiniteDuration duration = FiniteDuration.create(3, TimeUnit.SECONDS);
+            Future<Object> result = ask(counter, new CountingActor.Get(),
+                    Timeout.durationToTimeout(duration));
+            try {
+                System.out.println("Got back " + Await.result(result, duration));
+            } catch (Exception e) {
+                System.err.println("Failed getting result: " + e.getMessage());
+                throw e;
+            } finally {
+                system.terminate();
 
+            }
         }
     }
-}
 }
 
 

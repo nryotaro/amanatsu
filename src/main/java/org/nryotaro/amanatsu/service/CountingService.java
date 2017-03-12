@@ -1,4 +1,4 @@
-package org.nryotaro.amanatsu;
+package org.nryotaro.amanatsu.service;
 
 
 import org.springframework.stereotype.Component;

@@ -1,8 +1,9 @@
-package org.nryotaro.amanatsu;
+package org.nryotaro.amanatsu.actor;
 
+import akka.actor.AbstractActor;
 import akka.actor.UntypedActor;
+import org.nryotaro.amanatsu.service.CountingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,13 @@ import org.springframework.stereotype.Component;
  */
 @Component("CountingActor")
 @Scope("prototype")
-class CountingActor extends UntypedActor {
+public class CountingActor extends AbstractActor {
+
+  @Override
+  public Receive createReceive() {
+      
+    return null;
+  }
 
   public static class Count {}
   public static class Get {}
