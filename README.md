@@ -1,1 +1,1 @@
-# amanatsu
+# org.nryotaro.amanatsu.amanatsu

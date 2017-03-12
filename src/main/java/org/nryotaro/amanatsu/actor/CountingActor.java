@@ -23,7 +23,7 @@ public class CountingActor extends AbstractActor {
 
   private int count = 0;
 
-  // the service that will be automatically injected
+  // the org.nryotaro.amanatsu.service that will be automatically injected
   @Autowired
   CountingService countingService;
 

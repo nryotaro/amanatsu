@@ -4,7 +4,7 @@ package org.nryotaro.amanatsu.service;
 import org.springframework.stereotype.Component;
 
 /**
- * A simple service that can increment a number.
+ * A simple org.nryotaro.amanatsu.service that can increment a number.
  */
 @Component
 public class CountingService {
