@@ -2,10 +2,13 @@ package org.nryotaro.amanatsu.actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.UntypedActor;
+import akka.japi.pf.ReceiveBuilder;
+import akka.japi.pf.UnitPFBuilder;
 import org.nryotaro.amanatsu.service.CountingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 
 /**
@@ -18,24 +21,33 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class CountingActor extends AbstractActor {
 
+  private int count = 0;
+
+  // the service that will be automatically injected
+  @Autowired
+  CountingService countingService;
+
+
   @Override
   public Receive createReceive() {
-      
-    return null;
+    return receiveBuilder()
+            .match(Count.class, s -> count = countingService.increment(count))
+            .match(Get.class, g -> getSender().tell(count, getSelf()))
+            .matchAny(this::unhandled)
+            .build();
   }
+
 
   public static class Count {}
   public static class Get {}
 
-  // the service that will be automatically injected
-  final CountingService countingService;
 
+  /*
   @Autowired
   public CountingActor(CountingService countingService) {
     this.countingService = countingService;
   }
 
-  private int count = 0;
 
   @Override
   public void onReceive(Object message) throws Exception {
@@ -47,4 +59,5 @@ public class CountingActor extends AbstractActor {
       unhandled(message);
     }
   }
+  */
 }
