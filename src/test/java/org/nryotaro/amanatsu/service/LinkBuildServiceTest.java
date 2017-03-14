@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.net.URI;
@@ -14,6 +16,8 @@ import java.time.LocalDate;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest("edgar.url=https://www.sec.gov/")
+//@TestPropertySource(locations = "/application-ut.yml")
+@ActiveProfiles("ut")
 /*
 @ContextConfiguration(classes = Edgar.class,
         initializers = ConfigFileApplicationContextInitializer.class)

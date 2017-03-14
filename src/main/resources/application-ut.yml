@@ -1,1 +1,4 @@
-
+edgar:
+  url:
+    context: foobar
+    daily-index: Archives/edgar/daily-index/

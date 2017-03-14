@@ -1,2 +1,5 @@
 edgar:
-  url: https://www.sec.gov/
+  url:
+    context: https://www.sec.gov/
+    daily-index: Archives/edgar/daily-index/
+

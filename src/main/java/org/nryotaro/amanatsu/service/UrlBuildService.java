@@ -9,11 +9,10 @@ import java.time.LocalDateTime;
 @Service
 public class UrlBuildService {
 
-    @Value("${edgar.url}")
+    @Value("${edgar.url.context}")
     private String edgarUrl;
 
     public URI buildIndexLink(LocalDate date) {
-
-            throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 }
