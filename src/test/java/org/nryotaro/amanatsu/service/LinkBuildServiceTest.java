@@ -15,9 +15,9 @@ import java.net.URI;
 import java.time.LocalDate;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest("edgar.url=https://www.sec.gov/")
+@SpringBootTest({"edgar.url=https://www.sec.gov/", "edgar.url.daily-index=Archives/edgar/daily-index/"})
 //@TestPropertySource(locations = "/application-ut.yml")
-@ActiveProfiles("ut")
+//@ActiveProfiles("ut")
 /*
 @ContextConfiguration(classes = Edgar.class,
         initializers = ConfigFileApplicationContextInitializer.class)
@@ -27,11 +27,11 @@ public class LinkBuildServiceTest {
     @Autowired
     UrlBuildService service;
 
-    String url = "https:/www.sec.gov/";
+    String url = "https://www.sec.gov/";
 
     @Test
     public void testBuildIndexLink() throws Exception {
-        assertThat(service.buildIndexLink(LocalDate.parse("2016-08-16")),
+        assertThat(service.buildIndexLink(LocalDate.parse("2017-03-10")),
                 equalTo(new URI(url + "Archives/edgar/daily-index/2017/QTR1/crawler.20170310.idx")));
     }
 
