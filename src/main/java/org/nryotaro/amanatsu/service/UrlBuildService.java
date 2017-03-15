@@ -15,15 +15,15 @@ import java.util.Arrays;
 @Service
 public class UrlBuildService {
 
-    @Value("${edgar.url.context}")
-    private String edgarUrl;
+    @Value("${edgar.url.host}")
+    private String edgarHost;
 
     @Value("${edgar.url.daily-index}")
     private String edgarDailyIndex;
 
 
     public URI buildIndexLink(LocalDate date) throws URISyntaxException {
-        return new URI(edgarUrl + edgarDailyIndex + date.getYear() + "/" + buildQTR(date.getMonth()) + "/crawler."
+        return new URI("https://"+edgarHost +"/" + edgarDailyIndex + date.getYear() + "/" + buildQTR(date.getMonth()) + "/crawler."
                 + date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".idx");
     }
 

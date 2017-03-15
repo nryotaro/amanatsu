@@ -15,7 +15,7 @@ import java.net.URI;
 import java.time.LocalDate;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest({"edgar.url=https://www.sec.gov/", "edgar.url.daily-index=Archives/edgar/daily-index/"})
+@SpringBootTest({"edgar.url.host=www.sec.gov", "edgar.url.daily-index=Archives/edgar/daily-index/"})
 //@TestPropertySource(locations = "/application-ut.yml")
 //@ActiveProfiles("ut")
 /*
