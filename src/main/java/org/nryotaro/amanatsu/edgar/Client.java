@@ -26,12 +26,10 @@ public class Client {
     private String host;
 
 
-    private Channel channel ;
-    public Client() {
+    private Channel channel;
+    private EventLoopGroup workerGroup;
 
-    }
-
-    public void prepare() throws InterruptedException, URISyntaxException, SSLException {
+    public void connect() throws InterruptedException, URISyntaxException, SSLException {
 
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         SslContext ctx =  SslContext.newClientContext(SslProvider.JDK, InsecureTrustManagerFactory.INSTANCE);
@@ -67,7 +65,11 @@ public class Client {
     }
 
 
-    private void  sync () throws InterruptedException {
+    public void  sync () throws InterruptedException {
         channel.closeFuture().sync();
+    }
+
+    public void close() {
+        workerGroup.shutdownGracefully();
     }
 }

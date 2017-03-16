@@ -43,7 +43,10 @@ public class Edgar {
 
     public static void main(String[] args) {
 
-        SpringApplication.run(Edgar.class, args);
+        SpringApplication application = new SpringApplication(Edgar.class);
+        application.setWebEnvironment(false);
+        application.run(args);
+        //SpringApplication.run(Edgar.class, args);
     }
 
     class EdgarRunner implements CommandLineRunner {
@@ -51,6 +54,11 @@ public class Edgar {
         @Override
         public void run(String... strings) throws Exception {
 
+            client.connect();
+
+            client.sync();
+
+            client.close();
         }
     }
 
