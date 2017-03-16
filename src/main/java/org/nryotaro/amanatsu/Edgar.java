@@ -5,6 +5,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import org.nryotaro.amanatsu.actor.CountingActor;
+import org.nryotaro.amanatsu.edgar.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -31,6 +32,9 @@ public class Edgar {
     @Autowired
     ApplicationContext ctx;
 
+    @Autowired
+    Client client;
+
     @RequestMapping("/")
     @ResponseBody
     public String home() {
@@ -39,13 +43,20 @@ public class Edgar {
 
     public static void main(String[] args) {
 
-        
         SpringApplication.run(Edgar.class, args);
     }
 
+    class EdgarRunner implements CommandLineRunner {
+
+        @Override
+        public void run(String... strings) throws Exception {
+
+        }
+    }
+
     @Bean
-    public Runner runner() {
-        return new Runner();
+    public CommandLineRunner runner() {
+        return new EdgarRunner();
     }
 
     class Runner implements CommandLineRunner {
