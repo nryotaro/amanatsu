@@ -31,7 +31,7 @@ public class Client {
 
     public void connect() throws InterruptedException, URISyntaxException, SSLException {
 
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
         SslContext ctx =  SslContext.newClientContext(SslProvider.JDK, InsecureTrustManagerFactory.INSTANCE);
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerGroup);

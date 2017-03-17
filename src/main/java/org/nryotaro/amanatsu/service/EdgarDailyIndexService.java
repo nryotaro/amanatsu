@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 
 @Service
-public class UrlBuildService {
+public class EdgarDailyIndexService {
 
     @Value("${edgar.url.host}")
     private String edgarHost;

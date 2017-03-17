@@ -16,6 +16,8 @@ public class DownloadHandler extends ChannelHandlerAdapter {
         FullHttpResponse httpResp = (FullHttpResponse) msg;
         Headers headers =  httpResp.headers();
 
+        //out.println(headers);
+        //out.println(httpResp);
         out.println(httpResp.content().toString(CharsetUtil.UTF_8));
         ctx.close();
     }

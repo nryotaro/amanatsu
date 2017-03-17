@@ -6,6 +6,7 @@ import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import org.nryotaro.amanatsu.actor.CountingActor;
 import org.nryotaro.amanatsu.edgar.Client;
+import org.nryotaro.amanatsu.service.EdgarDailyIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,7 +19,10 @@ import org.springframework.boot.CommandLineRunner;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
+import sun.net.www.http.HttpClient;
 
+import java.net.URI;
+import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 import static akka.pattern.Patterns.ask;
@@ -35,6 +39,9 @@ public class Edgar {
     @Autowired
     Client client;
 
+    @Autowired
+    EdgarDailyIndexService service;
+
     @RequestMapping("/")
     @ResponseBody
     public String home() {
@@ -49,23 +56,27 @@ public class Edgar {
         //SpringApplication.run(Edgar.class, args);
     }
 
+    @Bean
+    public CommandLineRunner runner() {
+        return new EdgarRunner();
+    }
+
     class EdgarRunner implements CommandLineRunner {
 
         @Override
         public void run(String... strings) throws Exception {
 
+
+
             client.connect();
 
+            client.request(service.buildIndexLink(LocalDate.parse("2017-01-10")));
             client.sync();
 
             client.close();
         }
     }
 
-    @Bean
-    public CommandLineRunner runner() {
-        return new EdgarRunner();
-    }
 
     class Runner implements CommandLineRunner {
 
