@@ -13,9 +13,10 @@ class Sv {
 }
 
 @SpringBootApplication
-open class Foo(@Autowired sv: Sv) : CommandLineRunner {
+open class Foo (val sv: Sv) : CommandLineRunner {
 
     override fun run(vararg p0: String?) {
+        println(sv)
         println("foo")
         //throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
