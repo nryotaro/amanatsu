@@ -1,4 +1,4 @@
-package org.nryotaro.amanatsu.edgar;
+package org.nryotaro.edgar.edgar;
 
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;

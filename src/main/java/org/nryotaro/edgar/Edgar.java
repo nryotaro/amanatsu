@@ -1,12 +1,12 @@
-package org.nryotaro.amanatsu;
+package org.nryotaro.edgar;
 
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
-import org.nryotaro.amanatsu.actor.CountingActor;
-import org.nryotaro.amanatsu.edgar.Client;
-import org.nryotaro.amanatsu.service.EdgarDailyIndexService;
+import org.nryotaro.edgar.actor.CountingActor;
+import org.nryotaro.edgar.edgar.Client;
+import org.nryotaro.edgar.service.EdgarDailyIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,14 +19,12 @@ import org.springframework.boot.CommandLineRunner;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.FiniteDuration;
-import sun.net.www.http.HttpClient;
 
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.concurrent.TimeUnit;
 
 import static akka.pattern.Patterns.ask;
-import static org.nryotaro.amanatsu.actor.SpringExtension.SpringExtProvider;
+import static org.nryotaro.edgar.actor.SpringExtension.SpringExtProvider;
 
 @RestController
 @SpringBootApplication

@@ -1,4 +1,4 @@
-package org.nryotaro.amanatsu.actor;
+package org.nryotaro.edgar.actor;
 
 import akka.actor.Actor;
 import akka.actor.IndirectActorProducer;

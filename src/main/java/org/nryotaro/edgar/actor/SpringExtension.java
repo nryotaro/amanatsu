@@ -1,4 +1,4 @@
-package org.nryotaro.amanatsu.actor;
+package org.nryotaro.edgar.actor;
 
 import akka.actor.AbstractExtensionId;
 import akka.actor.ExtendedActorSystem;

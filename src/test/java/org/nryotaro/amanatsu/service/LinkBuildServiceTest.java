@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.nryotaro.edgar.service.EdgarDailyIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -17,7 +18,7 @@ import java.time.LocalDate;
 //@TestPropertySource(locations = "/application-ut.yml")
 //@ActiveProfiles("ut")
 /*
-@ContextConfiguration(classes = Edgar.class,
+@ContextConfiguration(classes = EdgarTest.class,
         initializers = ConfigFileApplicationContextInitializer.class)
         */
 public class LinkBuildServiceTest {

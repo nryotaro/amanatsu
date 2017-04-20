@@ -1,14 +1,10 @@
-package org.nryotaro.amanatsu.actor;
+package org.nryotaro.edgar.actor;
 
 import akka.actor.AbstractActor;
-import akka.actor.UntypedActor;
-import akka.japi.pf.ReceiveBuilder;
-import akka.japi.pf.UnitPFBuilder;
-import org.nryotaro.amanatsu.service.CountingService;
+import org.nryotaro.edgar.service.CountingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 
 /**

@@ -1,5 +1,4 @@
-package org.nryotaro.amanatsu.edgar;
-
+package org.nryotaro.edgar.edgar;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
