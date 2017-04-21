@@ -12,8 +12,8 @@ import org.junit.Assert.assertEquals
 import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
 
-//@RunWith(JUnitPlatform::class)
-object CmdParserSpec: Spek({
+@RunWith(JUnitPlatform::class)
+class CmdParserSpec: Spek({
     describe("a calculator") {
 
         on("addition") {
@@ -25,7 +25,7 @@ object CmdParserSpec: Spek({
         }
 
         on("subtraction") {
-            val subtract =  4-5
+            val subtract =  4-2
 
             it("should return the result of subtracting the second number from the first number") {
                 assertEquals(2, subtract)
