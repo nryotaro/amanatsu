@@ -14,21 +14,14 @@ import org.junit.runner.RunWith
 
 @RunWith(JUnitPlatform::class)
 class CmdParserSpec: Spek({
-    describe("a calculator") {
+    describe("CmdParser") {
 
-        on("addition") {
+        on("takes only date") {
+            CmdParser.parse("--d" ,"date")
             val sum = 2+4
 
             it("should return the result of adding the first number to the second number") {
                 assertEquals(6, sum)
-            }
-        }
-
-        on("subtraction") {
-            val subtract =  4-2
-
-            it("should return the result of subtracting the second number from the first number") {
-                assertEquals(2, subtract)
             }
         }
     }
