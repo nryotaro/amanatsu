@@ -21,13 +21,7 @@ open class Foo (val sv: Sv) : CommandLineRunner {
 
     override fun run(vararg args: String) {
         println(sv.c)
-        println("foo")
 
-        val c: String? = args[0]
-        if(c != null) {
-            val d: String = c
-
-        }
         CmdParser.parse(*args)
         //throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
