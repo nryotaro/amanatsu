@@ -22,7 +22,7 @@ open class Foo (val sv: Sv) : CommandLineRunner {
     override fun run(vararg args: String) {
         println(sv.c)
 
-        CmdParser.parse(*args)
+//        CmdParser.parse(*args)
         //throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
