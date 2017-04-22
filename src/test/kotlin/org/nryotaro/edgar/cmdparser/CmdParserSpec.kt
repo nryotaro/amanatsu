@@ -1,5 +1,6 @@
 package org.nryotaro.edgar.cmdparser
 
+import org.apache.commons.cli.Options
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
@@ -12,16 +13,25 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
+import org.nryotaro.edgar.Foo
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
-//@SpringBootTest
+@SpringBootTest
+//@ExtendWith(SpringExtension::class)
+@Import(Foo::class)
 class DemoApplicationTests {
+
+    @Autowired
+    lateinit var  options: Options
 
     @Test
     fun contextLoads() {
-        
+
         println("foobar")
     }
 
