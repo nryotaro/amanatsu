@@ -1,4 +1,4 @@
-package org.nryotaro.edgar.plainvannila
+package org.nryotaro.edgar.plain.cmd
 
 import java.io.File
 import java.nio.file.Path
