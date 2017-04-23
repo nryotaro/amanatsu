@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 
 
 @Service
-class Builder(@Value("\${dailyindex}") val dailyindex: String) {
+class Builder(@Value("\${url.dailyindex}") val dailyindex: String) {
 
     fun buildIndex(date: LocalDate): String {
        return  dailyindex + date.year.toString() + "/QTR" + calcQuarter(date) + "/crawler." +

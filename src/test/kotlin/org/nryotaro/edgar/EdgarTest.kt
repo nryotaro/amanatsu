@@ -22,7 +22,7 @@ open class EdgarTest {}
 @Service
 @Profile("ut")
 class EdgarMock: Edgar {
-    override fun execute() {
-    }
+    override fun execute(vararg args: String) {
 
+    }
 }
