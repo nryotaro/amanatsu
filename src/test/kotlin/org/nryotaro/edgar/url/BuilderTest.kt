@@ -5,6 +5,7 @@ import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.nryotaro.edgar.Bootstrap
+import org.nryotaro.edgar.cmdparser.CommandContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -14,7 +15,7 @@ import java.time.LocalDate
 @RunWith(SpringRunner::class)
 @SpringBootTest
 //@ExtendWith(SpringExtension::class)
-@Import(Bootstrap::class)
+@Import(CommandContext::class)
 class BuilderTest {
 
      @Autowired

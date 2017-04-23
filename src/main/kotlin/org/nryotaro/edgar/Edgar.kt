@@ -20,7 +20,6 @@ open class Bootstrap(val sv: Sv, val parser: CmdParser) : CommandLineRunner {
 
     override fun run(vararg args: String) {
 
-        println(sv.c)
     }
 
 }
