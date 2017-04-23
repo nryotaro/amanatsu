@@ -16,9 +16,10 @@ import java.util.Arrays.asList
 
 @SpringBootApplication
 @Import(CommandContext::class)
-open class Bootstrap(val sv: Sv) : CommandLineRunner {
+open class Bootstrap(val sv: Sv, val parser: CmdParser) : CommandLineRunner {
 
     override fun run(vararg args: String) {
+
         println(sv.c)
     }
 

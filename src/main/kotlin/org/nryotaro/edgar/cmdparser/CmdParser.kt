@@ -35,18 +35,11 @@ class CommandContext {
 class CmdParser(val options: Options) {
 
     fun parse(vararg args: String): Arguments {
-
         val commandLineParser: CommandLineParser = DefaultParser()
 
         val parsed: CommandLine = commandLineParser.parse(options, args)
 
-        val c: String = parsed.getOptionValue("d")
-
-        val cc = LocalDate.parse(c)
-
-        val d = parsed.getOptionValue("o")
-
-        return Arguments(cc, File(d))
+        return Arguments(LocalDate.parse(parsed.getOptionValue("d")), File(parsed.getOptionValue("o")))
 
     }
 }
