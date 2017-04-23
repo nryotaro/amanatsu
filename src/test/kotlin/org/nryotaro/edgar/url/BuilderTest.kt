@@ -5,10 +5,14 @@ import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.nryotaro.edgar.Bootstrap
+import org.nryotaro.edgar.Edgar
 import org.nryotaro.edgar.cmdparser.CommandContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Service
+import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import java.time.LocalDate
 
@@ -16,6 +20,7 @@ import java.time.LocalDate
 @SpringBootTest
 //@ExtendWith(SpringExtension::class)
 @Import(CommandContext::class)
+@ActiveProfiles("ut")
 class BuilderTest {
 
      @Autowired
@@ -27,7 +32,6 @@ class BuilderTest {
                 `is`("https://www.sec.gov/Archives/edgar/daily-index/2016/QTR4/crawler.20161202.idx"))
     }
 }
-
 
 
 
