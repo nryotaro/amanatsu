@@ -14,44 +14,30 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.util.Arrays.asList
 
+fun main(args: Array<String>) {
+    SpringApplication.run(Bootstrap::class.java, *args)
+}
 
 @SpringBootApplication
 @Import(CommandContext::class)
 open class Bootstrap(val edgar: Edgar, val parser: CmdParser) : CommandLineRunner {
 
     override fun run(vararg args: String) {
-
         edgar.execute()
     }
-
-
-}
-@Service
-@Profile("ut")
-class EdgarMock: Edgar {
-    override fun execute() {
-        println("bar")
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
 }
 
 interface Edgar {
-   fun execute()
+   fun execute(vararg args: String)
 }
 
 @Service
 @Profile("prod")
 class EdgarService: Edgar {
-    override fun execute() {
-
+    override fun execute(vararg args: String) {
         println("foo")
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
 }
 
 
-fun main(args: Array<String>) {
-    SpringApplication.run(Bootstrap::class.java, *args)
-}

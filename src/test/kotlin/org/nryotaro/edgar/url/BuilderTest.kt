@@ -6,6 +6,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.nryotaro.edgar.Bootstrap
 import org.nryotaro.edgar.Edgar
+import org.nryotaro.edgar.EdgarTest
 import org.nryotaro.edgar.cmdparser.CommandContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -16,12 +17,14 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import java.time.LocalDate
 
+/*
 @RunWith(SpringRunner::class)
 @SpringBootTest
 //@ExtendWith(SpringExtension::class)
 @Import(CommandContext::class)
 @ActiveProfiles("ut")
-class BuilderTest {
+*/
+class BuilderTest : EdgarTest() {
 
      @Autowired
     lateinit var builder: Builder
