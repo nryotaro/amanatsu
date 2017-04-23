@@ -1,32 +1,31 @@
 package org.nryotaro.edgar.cmdparser
 
-import org.apache.commons.cli.Options
-//import kotlin.test.assertEquals
-//import kotlin.test.todo
-
-import org.junit.Assert.assertEquals
+import org.hamcrest.CoreMatchers.`is`
+import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.nryotaro.edgar.Foo
+import org.nryotaro.edgar.Bootstrap
+import org.nryotaro.edgar.plainvannila.Arguments
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.junit4.SpringRunner
+import java.io.File
+import java.time.LocalDate
 
 @RunWith(SpringRunner::class)
 @SpringBootTest
 //@ExtendWith(SpringExtension::class)
-@Import(Foo::class)
+@Import(Bootstrap::class)
 class CmdParserTest {
 
     @Autowired
-    lateinit var  options: Options
+    lateinit var parser: CmdParser
 
     @Test
-    fun contextLoads() {
-
-        println("foobar")
+    fun parseArguments() {
+        val args =  parser.parse("-d", "2017-04-12", "-o", "/data")
+        assertThat(args,`is`(Arguments(LocalDate.parse("2017-04-12"), File("/data"))) )
     }
 
 }
