@@ -4,11 +4,13 @@ import org.nryotaro.edgar.url.Builder
 import org.springframework.beans.factory.annotation.Configurable
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
+import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 import java.time.LocalDate
 
 @Configurable
-class ClientContext {
+class EdgarClientContext {
 
     @Bean fun client(@Value("\${url.root}") edgarRootUrl: String): WebClient {
        return WebClient.create(edgarRootUrl)
@@ -16,14 +18,15 @@ class ClientContext {
 
 }
 
-class Client(val client: WebClient, val builder: Builder) {
+@Service
+class EdgarClient(val client: WebClient, val builder: Builder) {
 
     fun retrieveIndex(date: LocalDate) {
-        /*
-        client.get().uri {} = {
+        val c = builder.buildIndex(date)
+        val cc = client.get().uri(builder.buildIndex(date)).exchange().flatMap { e->
+            e.bodyToMono(String::class)
+        }.block()
 
-        }
-        */
-       val c= client.get().uri("Archives/edgar/daily-index/2017/QTR1/crawler.20170331.idx").exchange()
+        println(cc)
     }
 }

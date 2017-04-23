@@ -1,6 +1,7 @@
 package org.nryotaro.edgar
 
 import com.sun.xml.internal.fastinfoset.util.StringArray
+import org.nryotaro.edgar.client.EdgarClientContext
 import org.nryotaro.edgar.cmdparser.CmdParser
 import org.nryotaro.edgar.cmdparser.CommandContext
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +20,7 @@ fun main(args: Array<String>) {
 }
 
 @SpringBootApplication
-@Import(CommandContext::class)
+@Import(CommandContext::class, EdgarClientContext::class)
 open class Bootstrap(val edgar: Edgar, val parser: CmdParser) : CommandLineRunner {
 
     override fun run(vararg args: String) {

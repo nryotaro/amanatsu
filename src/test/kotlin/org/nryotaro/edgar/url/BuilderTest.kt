@@ -11,7 +11,7 @@ import java.time.LocalDate
 
 class BuilderTest : EdgarTest() {
 
-     @Autowired
+    @Autowired
     lateinit var builder: Builder
 
     @Test

@@ -15,13 +15,14 @@ import java.util.function.Function;
 
 public class FooTest {
 
-    @Test
+    //@Test
     public void foo() {
         		WebClient client =  WebClient.create("https://www.sec.gov");
 
 		String a = client.get().uri("Archiveis/edgar/daily-index/2017/QTR1/crawler.20170331.idx")
 				.exchange().flatMap(e ->
 						e.bodyToMono(String.class)).block();
+
 		System.out.println(a);
 		/*
 

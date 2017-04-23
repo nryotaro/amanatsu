@@ -5,6 +5,7 @@ import org.nryotaro.edgar.plain.cmd.Arguments
 import org.springframework.beans.factory.annotation.Configurable
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import java.io.File
 import java.nio.file.Paths
 import java.time.LocalDate
@@ -31,7 +32,7 @@ class CommandContext {
     }
 }
 
-@Component
+@Service
 class CmdParser(val options: Options) {
 
     fun parse(vararg args: String): Arguments {

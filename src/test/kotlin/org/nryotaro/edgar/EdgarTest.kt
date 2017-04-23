@@ -1,6 +1,7 @@
 package org.nryotaro.edgar
 
 import org.junit.runner.RunWith
+import org.nryotaro.edgar.client.EdgarClientContext
 import org.nryotaro.edgar.cmdparser.CommandContext
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
@@ -15,7 +16,7 @@ import java.lang.annotation.RetentionPolicy
 @RunWith(SpringRunner::class)
 @SpringBootTest
 //@ExtendWith(SpringExtension::class)
-@Import(CommandContext::class)
+//@Import(CommandContext::class, EdgarClientContext::class)
 @ActiveProfiles("ut")
 open class EdgarTest {}
 
