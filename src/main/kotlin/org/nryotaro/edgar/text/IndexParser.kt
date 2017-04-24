@@ -8,22 +8,20 @@ import java.time.format.DateTimeFormatter
 @Service
 class IndexParser {
 
-    private val pattern = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+    private val pattern = DateTimeFormatter.ofPattern("MMM dd, uuuu")
 
     fun parse(index: String) :String {
        val lines =  index.split(Regex("\\r?\\n"))
        var date: LocalDate?
 
-       lines.forEach date@ {
+       lines.forEach {
            println(it)
            if(it.startsWith("Last Data Received:")) {
-               val date: String?= Regex("Last Data Received:\\s+(\\w.+)").find(it)?.groupValues?.get(1)
+               val dateStr: String?= Regex("Last Data Received:\\s+(\\w.+)").find(it)?.groupValues?.get(1)
+               println(dateStr)
 
-               EdgarException("")
-               val c = if(date != null)  LocalDate.parse(date, pattern) else null
-               println(date)
-               //0LocalDate.parse(DateTime) DateTimeForm LocalDate
-               return@date
+               date = if(dateStr != null) LocalDate.parse(dateStr, pattern) else null
+               return@forEach
            }
        }
 
