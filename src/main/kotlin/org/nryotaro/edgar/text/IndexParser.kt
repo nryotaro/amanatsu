@@ -14,7 +14,9 @@ class IndexParser {
 
     fun parse(index: String) :String {
         val lines =  index.split(Regex("\\r?\\n"))
-        val c = extractDate(lines)
+        val date = extractDate(lines)
+        val  indices = extractIndexLine(lines)
+
        return TODO()
     }
 
@@ -22,5 +24,18 @@ class IndexParser {
         val dateLine: String = lines.first { it.startsWith("Last Data Received:") }
         val dateStr: String? = Regex("Last Data Received:\\s+(\\w.+)").find(dateLine)?.groupValues?.get(1)
         return if(dateStr != null) LocalDate.parse(dateStr, pattern) else throw EdgarException("failed to find date in \"$dateLine\"")
+    }
+
+    private fun extractIndexLine(lines: List<String>): List<String> {
+        var start: Int = -1
+        var found: Boolean = false
+        for(line in lines) {
+            start++
+            if(line.startsWith("-----")) {
+                found = true
+                break
+            }
+        }
+        return if(found) lines.subList(start+1, lines.size)  else throw EdgarException("----")
     }
 }
