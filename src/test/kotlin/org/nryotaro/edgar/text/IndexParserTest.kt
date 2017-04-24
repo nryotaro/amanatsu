@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.nio.file.Files
 
 
-class BuilderTest : EdgarTest() {
+class IndexParserTest : EdgarTest() {
 
 
    @Autowired
