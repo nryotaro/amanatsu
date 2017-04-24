@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import java.io.File
 import java.time.LocalDate
 
 @Configurable
@@ -26,6 +27,8 @@ class EdgarClient(val client: WebClient, val builder: Builder) {
         val cc = client.get().uri(builder.buildIndex(date)).exchange().flatMap { e->
             e.bodyToMono(String::class)
         }.block()
+
+        File("crawler.20170314.idx").writeText(cc)
 
         println(cc)
     }

@@ -15,15 +15,17 @@ class EdgarClientTest : EdgarTest() {
     @Autowired
     lateinit var edgarClient: EdgarClient
 
+    /*
     @MockBean
     lateinit var webClient: WebClient
 
     @MockBean
     lateinit  var spec: WebClient.UriSpec<WebClient.RequestHeadersSpec<*>>
+    */
 
     @Test fun retrieveIndex()  {
         //`when`(webClient.get()).thenReturn(c)
-        `when`(webClient.get()).thenThrow(UnsupportedOperationException("asdfasdfasdfa"))
+//        `when`(webClient.get()).thenThrow(UnsupportedOperationException("asdfasdfasdfa"))
 
         edgarClient.retrieveIndex(LocalDate.parse("2017-03-14"))
     }
