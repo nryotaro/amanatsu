@@ -15,10 +15,8 @@ import java.lang.annotation.RetentionPolicy
 
 @RunWith(SpringRunner::class)
 @SpringBootTest
-//@ExtendWith(SpringExtension::class)
-//@Import(CommandContext::class, EdgarClientContext::class)
 @ActiveProfiles("ut")
-open class EdgarTest {}
+open abstract class EdgarTest {}
 
 @Service
 @Profile("ut")

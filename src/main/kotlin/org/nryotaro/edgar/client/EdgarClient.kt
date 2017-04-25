@@ -27,6 +27,5 @@ class EdgarClient(val client: WebClient, val builder: Builder) {
                 .flatMap { e->
             e.bodyToMono(String::class)
         }.block()
-        println(cc)
     }
 }
