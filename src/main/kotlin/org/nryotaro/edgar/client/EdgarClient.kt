@@ -23,13 +23,10 @@ class EdgarClientContext {
 class EdgarClient(val client: WebClient, val builder: Builder) {
 
     fun retrieveIndex(date: LocalDate) {
-        val c = builder.buildIndex(date)
-        val cc = client.get().uri(builder.buildIndex(date)).exchange().flatMap { e->
+        val cc = client.get().uri(builder.buildIndex(date)).exchange()
+                .flatMap { e->
             e.bodyToMono(String::class)
         }.block()
-
-        File("crawler.20170314.idx").writeText(cc)
-
         println(cc)
     }
 }
