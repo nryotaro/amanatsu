@@ -18,22 +18,24 @@ class IndexParser {
 
     private val pattern = DateTimeFormatter.ofPattern("MMM dd, uuuu", Locale.US)
 
-    private val indexPtn = Regex("^(.+) {2,}(.+) {2,}(\\d+) {2,}(\\d+) {2,}(http\\S+)\\s*$")
+    private val indexPtn = Regex("^(.+?) {2,}(.+) {2,}(\\d+) {2,}(\\d+) {2,}(http\\S+)\\s*$")
     private val paddingPtn =  Regex(" {2,}")
 
     fun parse(index: String) :List<Index> {
         val lines =  index.split(Regex("\\r?\\n"))
         val date = extractDate(lines)
         val  indices = extractIndexLine(lines)
-        return indices.map { extractIndex(it)}
+        return indices.filter {!it.isBlank()}.map { extractIndex(it)}
     }
 
     private fun extractIndex(line: String): Index {
-        val found: List<String> = line.split(paddingPtn)
+        val found=  line.trim().split(paddingPtn)
+        val size = found.size
 
         try {
-            return Index(companyName = found[0], formType = found[1], cik=Integer.parseInt(found[2]),
-                    dateFiled =  LocalDate.parse(found[3], DateTimeFormatter.BASIC_ISO_DATE), url = found[4])
+            return Index(companyName = found.subList(0, size-4).reduce { acc, s ->  acc + s},
+                    formType = found[size-4], cik=Integer.parseInt(found[size-3]),
+                    dateFiled =  LocalDate.parse(found[size-2], DateTimeFormatter.BASIC_ISO_DATE), url = found[size-1])
         } catch(e: Throwable) {
             logger.error("failed to parse index{}", line)
             throw EdgarException(e)
