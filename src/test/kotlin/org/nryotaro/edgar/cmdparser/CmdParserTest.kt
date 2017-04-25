@@ -5,6 +5,7 @@ import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.nryotaro.edgar.Bootstrap
+import org.nryotaro.edgar.EdgarTest
 import org.nryotaro.edgar.plain.cmd.Arguments
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -13,11 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner
 import java.io.File
 import java.time.LocalDate
 
-@RunWith(SpringRunner::class)
-@SpringBootTest
-//@ExtendWith(SpringExtension::class)
-@Import(Bootstrap::class)
-class CmdParserTest {
+
+class CmdParserTest : EdgarTest(){
 
     @Autowired
     lateinit var parser: CmdParser
