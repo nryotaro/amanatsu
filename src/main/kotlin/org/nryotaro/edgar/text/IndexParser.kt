@@ -3,6 +3,7 @@ package org.nryotaro.edgar.text
 import org.nryotaro.edgar.Edgar
 import org.nryotaro.edgar.exception.EdgarException
 import org.nryotaro.edgar.plain.index.Index
+import org.nryotaro.edgar.plain.index.Indices
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cglib.core.Local
@@ -14,24 +15,20 @@ import java.util.*
 
 @Service
 class IndexParser {
-    val logger: Logger = LoggerFactory.getLogger(this.javaClass)
-
+    private val logger: Logger = LoggerFactory.getLogger(this.javaClass)
     private val pattern = DateTimeFormatter.ofPattern("MMM dd, uuuu", Locale.US)
-
-    private val indexPtn = Regex("^(.+?) {2,}(.+) {2,}(\\d+) {2,}(\\d+) {2,}(http\\S+)\\s*$")
     private val paddingPtn =  Regex(" {2,}")
 
-    fun parse(index: String) :List<Index> {
+    fun parse(index: String) :Indices {
         val lines =  index.split(Regex("\\r?\\n"))
         val date = extractDate(lines)
         val  indices = extractIndexLine(lines)
-        return indices.filter {!it.isBlank()}.map { extractIndex(it)}
+        return  Indices(date, indices.filter {!it.isBlank()}.map { extractIndex(it)})
     }
 
     private fun extractIndex(line: String): Index {
         val found=  line.trim().split(paddingPtn)
         val size = found.size
-
         try {
             return Index(companyName = found.subList(0, size-4).reduce { acc, s ->  acc + s},
                     formType = found[size-4], cik=Integer.parseInt(found[size-3]),
@@ -40,7 +37,6 @@ class IndexParser {
             logger.error("failed to parse index{}", line)
             throw EdgarException(e)
         }
-
     }
 
     private fun extractDate(lines: List<String>): LocalDate {
