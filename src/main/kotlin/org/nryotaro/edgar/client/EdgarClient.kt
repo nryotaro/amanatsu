@@ -1,5 +1,6 @@
 package org.nryotaro.edgar.client
 
+import org.nryotaro.edgar.plain.http.RawHttpResponse
 import org.nryotaro.edgar.url.Builder
 import org.springframework.beans.factory.annotation.Configurable
 import org.springframework.beans.factory.annotation.Value
@@ -7,6 +8,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
+import reactor.core.publisher.Mono
 import java.io.File
 import java.time.LocalDate
 
@@ -27,5 +29,11 @@ class EdgarClient(val client: WebClient, val builder: Builder) {
                 .flatMap { e->
             e.bodyToMono(String::class)
         }.block()
+    }
+
+    fun get(url: String): Mono<RawHttpResponse> {
+        return client.get().uri(url).exchange().flatMap {
+            Mono.justOrEmpty(RawHttpResponse(it.statusCode(), it.bodyToMono(String::class)))
+        }
     }
 }
