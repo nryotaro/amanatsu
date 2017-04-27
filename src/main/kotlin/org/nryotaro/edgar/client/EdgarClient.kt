@@ -1,11 +1,15 @@
 package org.nryotaro.edgar.client
 
-import org.nryotaro.edgar.plain.http.RawHttpResponse
 import org.nryotaro.edgar.url.Builder
 import org.springframework.beans.factory.annotation.Configurable
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
+import org.springframework.http.client.reactive.ClientHttpResponse
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.BodyExtractor
+import org.springframework.web.reactive.function.BodyExtractors
+import org.springframework.web.reactive.function.client.ClientRequest
+import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
@@ -24,18 +28,10 @@ class EdgarClientContext {
 @Service
 class EdgarClient(val client: WebClient, val builder: Builder) {
 
-    /*
-    fun retrieveIndex(date: LocalDate) {
-        val cc = client.get().uri(builder.buildIndex(date)).exchange()
-                .flatMap { e->
-            e.bodyToMono(String::class)
-        }.block()
-    }
-    */
 
-    fun get(url: String): Mono<RawHttpResponse> {
-        return client.get().uri(url).exchange().flatMap {
-            Mono.justOrEmpty(RawHttpResponse(it.statusCode(), it.bodyToMono(String::class)))
+    fun get(url: String): Mono<String> {
+        return client.get().uri(url).exchange().flatMap{
+            if(it.statusCode().is2xxSuccessful) it.bodyToMono(String::class) else Mono.empty()
         }
     }
 }

@@ -17,6 +17,7 @@ class IndexRepository(val client: EdgarClient, @Value("\${url.dailyindex}") priv
     fun  retrieve(date: LocalDate) {
         val resp: Mono<RawHttpResponse> = client.get(buildIndex(date))
 
+
         val c: Mono<Mono<Indices>> = resp.map {
             if(it.status.is2xxSuccessful) {
                 it.body.map { parser.parse(it) }
