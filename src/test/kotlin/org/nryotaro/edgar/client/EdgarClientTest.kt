@@ -27,6 +27,5 @@ class EdgarClientTest : EdgarTest() {
         //`when`(webClient.get()).thenReturn(c)
 //        `when`(webClient.get()).thenThrow(UnsupportedOperationException("asdfasdfasdfa"))
 
-        edgarClient.retrieveIndex(LocalDate.parse("2017-03-14"))
     }
 }

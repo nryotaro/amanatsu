@@ -1,10 +1,14 @@
 package org.nryotaro.edgar.repository
 
 import org.nryotaro.edgar.client.EdgarClient
-import org.nryotaro.edgar.plain.http.RawHttpResponse
 import org.nryotaro.edgar.plain.index.Indices
 import org.nryotaro.edgar.text.IndexParser
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus.Series.INFORMATIONAL
+import org.springframework.http.HttpStatus.Series.SUCCESSFUL
+import org.springframework.http.HttpStatus.Series.REDIRECTION
+import org.springframework.http.HttpStatus.Series.SERVER_ERROR
+import org.springframework.http.HttpStatus.Series.CLIENT_ERROR
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -14,25 +18,24 @@ import reactor.core.publisher.Mono
 class IndexRepository(val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String,
                       private val parser: IndexParser) {
 
-    fun  retrieve(date: LocalDate) {
-        val resp: Mono<RawHttpResponse> = client.get(buildIndex(date))
-
-
-        val c: Mono<Mono<Indices>> = resp.map {
-            if(it.status.is2xxSuccessful) {
-                it.body.map { parser.parse(it) }
-            }else {
-                Mono.empty()
-            }
+    fun  retrieve(date: LocalDate): Mono<Indices> {
+         return client.getRawResponse(buildIndex(date)).flatMap {
+              when(it.statusCode().series()) {
+                 INFORMATIONAL -> TODO("information")
+                 SUCCESSFUL -> it.bodyToMono(String::class.java).flatMap{ Mono.just(parser.parse(it)) }
+                 REDIRECTION -> TODO("redirection")
+                 CLIENT_ERROR -> Mono.empty()
+                 SERVER_ERROR -> TODO("server error")
+             }
         }
     }
 
-    private fun buildIndex(date: LocalDate): String {
+    fun buildIndex(date: LocalDate): String {
         return  dailyIndex + date.year.toString() + "/QTR" + calcQuarter(date) + "/crawler." +
                 date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".idx"
     }
 
-    private fun calcQuarter(date: LocalDate): Int {
+    fun calcQuarter(date: LocalDate): Int {
         return when (date.monthValue) {
             1, 2, 3 -> 1
             4, 5, 6 -> 2
