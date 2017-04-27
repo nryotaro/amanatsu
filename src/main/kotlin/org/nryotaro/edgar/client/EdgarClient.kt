@@ -29,6 +29,10 @@ class EdgarClientContext {
 class EdgarClient(val client: WebClient, val builder: Builder) {
 
 
+    fun getRawResponse(url: String): Mono<ClientResponse> {
+       return client.get().uri(url).exchange()
+    }
+
     fun get(url: String): Mono<String> {
         return client.get().uri(url).exchange().flatMap{
             if(it.statusCode().is2xxSuccessful) it.bodyToMono(String::class) else Mono.empty()
