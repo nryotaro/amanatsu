@@ -24,12 +24,14 @@ class EdgarClientContext {
 @Service
 class EdgarClient(val client: WebClient, val builder: Builder) {
 
+    /*
     fun retrieveIndex(date: LocalDate) {
         val cc = client.get().uri(builder.buildIndex(date)).exchange()
                 .flatMap { e->
             e.bodyToMono(String::class)
         }.block()
     }
+    */
 
     fun get(url: String): Mono<RawHttpResponse> {
         return client.get().uri(url).exchange().flatMap {

@@ -3,6 +3,7 @@ package org.nryotaro.edgar.repository
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.http.RawHttpResponse
 import org.nryotaro.edgar.plain.index.Indices
+import org.nryotaro.edgar.text.IndexParser
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -10,16 +11,19 @@ import java.time.format.DateTimeFormatter
 import reactor.core.publisher.Mono
 
 @Component
-class IndexRepository(val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String) {
+class IndexRepository(val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String,
+                      private val parser: IndexParser) {
 
-    fun  retrieve(date: LocalDate): Indices {
+    fun  retrieve(date: LocalDate) {
         val resp: Mono<RawHttpResponse> = client.get(buildIndex(date))
 
-        println(resp.flatMap {
-            it.body }.block())
-
-        //return client.retrieveIndex(date)
-        TODO()
+        val c: Mono<Mono<Indices>> = resp.map {
+            if(it.status.is2xxSuccessful) {
+                it.body.map { parser.parse(it) }
+            }else {
+                Mono.empty()
+            }
+        }
     }
 
     private fun buildIndex(date: LocalDate): String {
