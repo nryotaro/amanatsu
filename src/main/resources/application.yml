@@ -2,7 +2,3 @@ url:
   root: https://www.sec.gov/
   dailyindex: Archives/edgar/daily-index/
 
-logging:
-  level:
-    org:
-      springframework=TRACE
