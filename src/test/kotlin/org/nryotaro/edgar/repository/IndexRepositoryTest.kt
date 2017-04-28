@@ -12,6 +12,7 @@ class IndexRepositoryTest : EdgarTest() {
     lateinit var indexRepository: IndexRepository
     @Test
     fun retrieve() {
-        println(indexRepository.retrieve(LocalDate.parse("2017-03-14")).block())
+        indexRepository.retrieve(LocalDate.parse("2017-03-14")).block()
+        indexRepository.retrieve(LocalDate.parse("2017-03-14")).block()
     }
 }

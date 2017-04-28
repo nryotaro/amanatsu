@@ -16,12 +16,11 @@ import java.lang.annotation.RetentionPolicy
 @RunWith(SpringRunner::class)
 @SpringBootTest
 @ActiveProfiles("ut")
-open abstract class EdgarTest {}
+abstract class EdgarTest {}
 
 @Service
 @Profile("ut")
 class EdgarMock: Edgar {
     override fun execute(vararg args: String) {
-
     }
 }
