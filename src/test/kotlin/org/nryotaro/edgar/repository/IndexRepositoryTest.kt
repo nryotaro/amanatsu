@@ -5,6 +5,7 @@ import org.mockito.Mockito.`when`
 import org.nryotaro.edgar.EdgarTest
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.client.EdgarClientTest
+import org.nryotaro.edgar.plain.index.Indices
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpStatus
@@ -28,11 +29,12 @@ class IndexRepositoryTest : EdgarTest() {
 
     @Test
     fun retrieve() {
-        `when`(clientResponse.statusCode().series()).thenReturn(HttpStatus.Series.SUCCESSFUL)
-        `when`(clientResponse.bodyToMono(String::class.java)).thenReturn(Mono.just(""))
+        val text =  this.javaClass.getResourceAsStream("crawler.20170314.idx").bufferedReader().use { it.readText() }
+        `when`(clientResponse.statusCode()).thenReturn(HttpStatus.OK)
+        `when`(clientResponse.bodyToMono(String::class.java)).thenReturn(Mono.just(text))
         `when`(client.getRawResponse("Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx"))
                 .thenReturn(Mono.just(clientResponse))
+        val indices: Indices =  indexRepository.retrieve(LocalDate.parse("2017-03-14")).block()
 
-        indexRepository.retrieve(LocalDate.parse("2017-03-14")).block()
     }
 }
