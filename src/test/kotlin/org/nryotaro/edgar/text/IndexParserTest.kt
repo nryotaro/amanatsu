@@ -14,7 +14,6 @@ class IndexParserTest : EdgarTest() {
    lateinit var parser: IndexParser
 
    @Test fun parseIndex()  {
-
        val text =  this.javaClass.getResourceAsStream("crawler.20170314.idx").bufferedReader().use { it.readText() }
        val indices = parser.parse(text)
 

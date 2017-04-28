@@ -25,12 +25,12 @@ class EdgarClientContext {
 
 }
 
-@Service
 interface EdgarClient {
     fun getRawResponse(url: String): Mono<ClientResponse>
     fun get(url: String): Mono<String>
 }
 
+@Service
 class EdgarClientImpl(val client: WebClient, val builder: Builder): EdgarClient {
 
     override  fun getRawResponse(url: String): Mono<ClientResponse> {
