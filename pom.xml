@@ -126,6 +126,9 @@
                     <includes>
                         <include>**/*Test</include>
                     </includes>
+					<excludes>
+						<exclude>**/*TODO</exclude>
+					</excludes>
                 </configuration>
             </plugin>
 		</plugins>

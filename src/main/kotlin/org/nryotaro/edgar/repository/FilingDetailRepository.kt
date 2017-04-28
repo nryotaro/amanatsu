@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @Repository
 class FilingDetailRepository(val client: EdgarClient) {
 
-    fun retrieve(index: Index) = {
-        TODO()
+    fun retrieve(index: Index) {
+        TODO("${index} was passed but, this functions isn't implemented")
     }
 }
