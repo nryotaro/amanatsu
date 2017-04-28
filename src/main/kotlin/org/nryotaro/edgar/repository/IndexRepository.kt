@@ -14,11 +14,13 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import reactor.core.publisher.Mono
 
+@Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 @Component
 class IndexRepository(val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String,
                       private val parser: IndexParser) {
 
     fun  retrieve(date: LocalDate): Mono<Indices> {
+        println(buildIndex(date))
          return client.getRawResponse(buildIndex(date)).flatMap {
               when(it.statusCode().series()) {
                  INFORMATIONAL -> TODO("information")
