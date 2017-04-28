@@ -46,7 +46,4 @@ class IndexRepository(val client: EdgarClient, @Value("\${url.dailyindex}") priv
             else -> throw UnsupportedOperationException("the month of $date could be null")
         }
     }
-
-
-
 }

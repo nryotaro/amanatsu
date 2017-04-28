@@ -31,15 +31,20 @@ interface EdgarClient {
 }
 
 @Service
-class EdgarClientImpl(val client: WebClient, val builder: Builder): EdgarClient {
+class EdgarClientImpl(val client: WebClient,
+                      @Value("\${url.root}") edgarRootUrl: String): EdgarClient {
 
     override  fun getRawResponse(url: String): Mono<ClientResponse> {
        return client.get().uri(url).exchange()
     }
 
-    override  fun get(url: String): Mono<String> {
+    override fun get(url: String): Mono<String> {
         return client.get().uri(url).exchange().flatMap{
             if(it.statusCode().is2xxSuccessful) it.bodyToMono(String::class) else Mono.empty()
         }
+    }
+
+    private fun cutEdgarRootUrl() {
+        TODO("for filing detail page")
     }
 }

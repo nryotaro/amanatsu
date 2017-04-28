@@ -23,4 +23,6 @@ class Builder(@Value("\${url.dailyindex}") private val dailyindex: String) {
              else -> throw UnsupportedOperationException("the month of $date could be null")
          }
     }
+
+
 }
