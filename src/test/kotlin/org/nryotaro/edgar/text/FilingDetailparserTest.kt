@@ -12,7 +12,8 @@ class FilingDetailParserTest: EdgarTest() {
 
     @Test
     fun parse() {
-        parser.parse(readTextFile("0001209191-17-028829-index.htm", FilingDetailParserTest::class))
+        val c = parser.parse(readTextFile("0001209191-17-028829-index.htm", FilingDetailParserTest::class))
+        println(c)
     }
 
 }
