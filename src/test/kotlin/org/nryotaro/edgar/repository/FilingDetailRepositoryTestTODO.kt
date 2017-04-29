@@ -4,6 +4,7 @@ import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
 import org.nryotaro.edgar.EdgarTest
+import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.index.Index
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
@@ -12,6 +13,10 @@ class FilingDetailRepositoryTest : EdgarTest() {
 
     @Autowired
     lateinit var filingDetailRepository: FilingDetailRepository
+
+    lateinit var client: EdgarClient
+
+
 
     @Test fun retrieve() {
         filingDetailRepository.retrieve(Index(
@@ -22,4 +27,6 @@ class FilingDetailRepositoryTest : EdgarTest() {
                 url = "http://www.sec.gov/Archives/edgar/data/34782/0000034782-17-000039-index.htm"
         ))
     }
+
+
 }
