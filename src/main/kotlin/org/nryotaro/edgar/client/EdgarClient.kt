@@ -40,11 +40,15 @@ class EdgarClientImpl(val client: WebClient,
         }
     }
 
+    /**
+     * TODO write test
+     */
     override fun getBin(url: String): Mono<DataBuffer> {
         return client.get().uri(cutEdgarRootUrl(url)).exchange().flatMapMany {
             it.body(BodyExtractors.toDataBuffers())
         }.reduce{acc, b -> acc.write(b)}
     }
+
 
     private fun cutEdgarRootUrl(url: String): String {
         return url.substringAfter(edgarRootUrl)
