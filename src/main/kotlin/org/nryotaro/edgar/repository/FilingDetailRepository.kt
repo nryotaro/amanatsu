@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient
 class FilingDetailRepository(val client: EdgarClient) {
 
     fun retrieve(index: Index) {
+         println(client.get(index.url).block())
         TODO("${index} was passed but, this functions isn't implemented")
     }
 }
