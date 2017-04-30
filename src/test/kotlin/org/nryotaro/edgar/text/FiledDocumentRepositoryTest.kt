@@ -16,8 +16,6 @@ class FiledDocumentRepositoryTest: EdgarTest() {
 
     @Test
     fun retrieve(){
-        //filedDocumentRepository.retrieve()
-        TODO()
 
     }
 }

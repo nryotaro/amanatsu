@@ -57,15 +57,15 @@ class EdgarClientImpl(val client: WebClient,
     }
 
     /**
-     * TODO subscribe on Success
+     * TODO write test
      */
     override  fun download(url: String, path: Path): Disposable {
-        val chann = FileChannel.open(path, StandardOpenOption.WRITE)
+        val chan = FileChannel.open(path, StandardOpenOption.WRITE)
         return client.get().uri(url).exchange().flatMapMany {
             it.body(BodyExtractors.toDataBuffers())
-        }.subscribe{
-            chann.write(it.asByteBuffer())
-       }
+        }.subscribe({chan.write(it.asByteBuffer())},
+                {chan.close()},
+                {chan.close()})
     }
 
     private fun cutEdgarRootUrl(url: String): String {

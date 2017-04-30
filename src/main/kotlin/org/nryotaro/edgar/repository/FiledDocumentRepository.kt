@@ -10,6 +10,6 @@ import javax.validation.ReportAsSingleViolation
 class FiledDocumentRepository(private val client: EdgarClient) {
 
     fun retrieve(outputRoot: File, documentUrl: String) {
-
+        TODO()
     }
 }
