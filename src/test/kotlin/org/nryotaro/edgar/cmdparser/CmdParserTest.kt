@@ -1,5 +1,7 @@
 package org.nryotaro.edgar.cmdparser
 
+import org.apache.commons.cli.MissingArgumentException
+import org.apache.commons.cli.ParseException
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -26,4 +28,13 @@ class CmdParserTest : EdgarTest(){
         assertThat(args,`is`(Arguments(LocalDate.parse("2017-04-12"), File("/data"))) )
     }
 
+    @Test(expected = ParseException::class)
+    fun parseMalformedArguments() {
+        parser.parse("-d", "-o", "/data")
+    }
+
+    @Test(expected = ParseException::class)
+    fun parseEmptyArguments() {
+        parser.parse()
+    }
 }
