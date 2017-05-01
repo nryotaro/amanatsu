@@ -3,14 +3,15 @@ package org.nryotaro.edgar
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.nryotaro.edgar.annotation.qualifier.MainRunner
+import org.nryotaro.edgar.cmdparser.CmdParser
+import org.nryotaro.edgar.repository.FiledDocumentRepository
+import org.nryotaro.edgar.repository.FilingDetailRepository
+import org.nryotaro.edgar.repository.IndexRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Configurable
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.*
 import org.springframework.stereotype.Service
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
 import kotlin.reflect.KClass
 
@@ -35,20 +36,25 @@ class EdgarMock: Edgar {
 
 @Configuration
 open class EdgarRunnerConfiguration {
-   @Bean
-   @MainRunner
-   open fun edgar(): Edgar {
-       return EdgarService()
-   }
+
+    @Bean
+    @MainRunner
+    open fun edgar(
+            cmdParser: CmdParser,
+            indexRepository: IndexRepository,
+            filingDetailRepository: FilingDetailRepository,
+            filedDocumentRepository: FiledDocumentRepository): Edgar {
+        return EdgarImpl(cmdParser, indexRepository, filingDetailRepository, filedDocumentRepository)
+    }
 }
 
-class ATest: EdgarTest() {
+class EdgarBootstrapTest : EdgarTest() {
 
     @Autowired
     @MainRunner
     lateinit var edgar: Edgar
 
-    @Test fun t() {
-        println("foo")
+    @Test fun execute() {
+        edgar.execute("-d", "2017-03-14", "-o", "~")
     }
 }

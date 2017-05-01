@@ -4,6 +4,10 @@ import org.nryotaro.edgar.annotation.qualifier.MainRunner
 import org.nryotaro.edgar.client.EdgarClientContext
 import org.nryotaro.edgar.cmdparser.CmdParser
 import org.nryotaro.edgar.cmdparser.CommandContext
+import org.nryotaro.edgar.plain.cmd.Arguments
+import org.nryotaro.edgar.repository.FiledDocumentRepository
+import org.nryotaro.edgar.repository.FilingDetailRepository
+import org.nryotaro.edgar.repository.IndexRepository
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -35,9 +39,15 @@ interface Edgar {
 
 @Service
 @Profile("prod")
-class EdgarService: Edgar {
+class EdgarImpl(
+        private val cmdParser: CmdParser,
+        private val indexRepository: IndexRepository,
+        private val filingDetailRepository: FilingDetailRepository,
+        private val filedDocumentRepository: FiledDocumentRepository): Edgar {
     override fun execute(vararg args: String) {
-        println("foo")
+        val args: Arguments =  cmdParser.parse(*args)
+
+        println(args)
     }
 }
 
