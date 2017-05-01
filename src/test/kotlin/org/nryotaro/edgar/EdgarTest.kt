@@ -1,5 +1,10 @@
 package org.nryotaro.edgar
 
+import org.assertj.core.api.Assertions
+import org.hamcrest.core.Is.`is`
+import org.junit.Assert.assertThat
+import org.junit.ClassRule
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.nryotaro.edgar.annotation.qualifier.MainRunner
@@ -9,6 +14,7 @@ import org.nryotaro.edgar.repository.FilingDetailRepository
 import org.nryotaro.edgar.repository.IndexRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.rule.OutputCapture
 import org.springframework.context.annotation.*
 import org.springframework.stereotype.Service
 import org.springframework.test.context.ActiveProfiles
@@ -54,7 +60,11 @@ class EdgarBootstrapTest : EdgarTest() {
     @MainRunner
     lateinit var edgar: Edgar
 
+    @get:Rule
+    val  outputCapture = OutputCapture()
+
     @Test fun execute() {
-        edgar.execute("-d", "2017-03-14", "-o", "~")
+        edgar.execute("-d")
+        assertThat(outputCapture.toString(), `is`(""))
     }
 }

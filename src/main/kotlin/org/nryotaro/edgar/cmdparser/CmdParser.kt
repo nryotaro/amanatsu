@@ -36,6 +36,7 @@ class CommandContext {
 class CmdParser(val options: Options) {
 
     fun parse(vararg args: String): Arguments {
+
         val commandLineParser: CommandLineParser = DefaultParser()
 
         val parsed: CommandLine = commandLineParser.parse(options, args)

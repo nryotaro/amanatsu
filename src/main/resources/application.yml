@@ -1,6 +1,8 @@
 spring:
   main:
     web-environment: false
+  application:
+    name: edgar-crawler
 url:
   root: https://www.sec.gov/
   dailyindex: Archives/edgar/daily-index/
