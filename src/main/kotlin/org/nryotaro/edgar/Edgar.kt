@@ -11,6 +11,7 @@ import org.nryotaro.edgar.repository.FiledDocumentRepository
 import org.nryotaro.edgar.repository.FilingDetailRepository
 import org.nryotaro.edgar.repository.IndexRepository
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
@@ -42,20 +43,21 @@ interface Edgar {
 @Service
 @Profile("prod")
 class EdgarImpl(
+        @Value("\${spring.application.name}") val appName: String,
         private val cmdParser: CmdParser,
         private val indexRepository: IndexRepository,
         private val filingDetailRepository: FilingDetailRepository,
         private val filedDocumentRepository: FiledDocumentRepository): Edgar {
     override fun execute(vararg args: String) {
-        val args: Arguments? = try {cmdParser.parse(*args)} catch(e: ParseException) {
+        val arguments: Arguments = try {cmdParser.parse(*args)} catch(e: ParseException) {
             val n = System.lineSeparator()
             System.err.println("${e.message + n}")
-            HelpFormatter().printHelp("myapp", "Download documents filed in Edgar\n\n",
+            HelpFormatter().printHelp(appName, "Download documents filed with Edgar$n$n",
                     cmdParser.options,
-                    "\nPlease report issues at https://github.com/nryotaro/edgar-crawler",
+                    "${n}Please report issues at https://github.com/nryotaro/edgar-crawler",
                     true)
             null
-        }
+        } ?: return
     }
 }
 
