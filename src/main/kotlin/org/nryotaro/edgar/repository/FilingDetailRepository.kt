@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
 
 @Repository
-class FilingDetailRepository(val client: EdgarClient, val filingDetailParser: FilingDetailParser) {
+class FilingDetailRepository(private val client: EdgarClient, val filingDetailParser: FilingDetailParser) {
 
     fun retrieve(index: Index): Flux<FilingDetail> {
         return client.get(index.url).flatMapIterable{filingDetailParser.parse(it)}

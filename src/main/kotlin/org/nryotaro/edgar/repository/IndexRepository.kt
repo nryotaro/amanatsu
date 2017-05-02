@@ -3,6 +3,8 @@ package org.nryotaro.edgar.repository
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.index.Indices
 import org.nryotaro.edgar.text.IndexParser
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.Series.INFORMATIONAL
 import org.springframework.http.HttpStatus.Series.SUCCESSFUL
@@ -16,17 +18,22 @@ import reactor.core.publisher.Mono
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 @Component
-class IndexRepository(val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String,
+class IndexRepository(private val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String,
                       private val parser: IndexParser) {
+    val log: Logger = LoggerFactory.getLogger(this::class.java)
+    val verboseLog: Logger = LoggerFactory.getLogger("verbose")
 
     fun  retrieve(date: LocalDate): Mono<Indices> {
-        println(buildIndex(date))
+
          return client.getRawResponse(buildIndex(date)).flatMap {
               when(it.statusCode().series()) {
                  INFORMATIONAL -> TODO("information")
                  SUCCESSFUL -> it.bodyToMono(String::class.java).flatMap{ Mono.just(parser.parse(it)) }
                  REDIRECTION -> TODO("redirection")
-                 CLIENT_ERROR -> Mono.empty()
+                 CLIENT_ERROR -> {
+                     log.info("the index of $date was not submitted")
+                     verboseLog.info("help me!!")
+                     Mono.empty()}
                  SERVER_ERROR -> TODO("server error")
              }
         }

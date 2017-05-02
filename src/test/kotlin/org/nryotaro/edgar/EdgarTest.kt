@@ -81,8 +81,12 @@ class EdgarBootstrapTest : EdgarTest() {
     |
     """.trimMargin()
 
-    @Test fun execute() {
+    @Test fun error() {
         edgar.execute("-d")
+        assertThat(outputCapture.toString(), `is`(help))
+    }
+    @Test fun indexNotFound() {
+        edgar.execute("-d", "2017-04-29", "-o", "/home/")
         assertThat(outputCapture.toString(), `is`(help))
     }
 }

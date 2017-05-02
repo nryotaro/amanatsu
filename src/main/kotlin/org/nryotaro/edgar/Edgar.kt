@@ -7,6 +7,9 @@ import org.nryotaro.edgar.client.EdgarClientContext
 import org.nryotaro.edgar.cmdparser.CmdParser
 import org.nryotaro.edgar.cmdparser.CommandContext
 import org.nryotaro.edgar.plain.cmd.Arguments
+import org.nryotaro.edgar.plain.filingdetail.FilingDetail
+import org.nryotaro.edgar.plain.index.Index
+import org.nryotaro.edgar.plain.index.Indices
 import org.nryotaro.edgar.repository.FiledDocumentRepository
 import org.nryotaro.edgar.repository.FilingDetailRepository
 import org.nryotaro.edgar.repository.IndexRepository
@@ -20,6 +23,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 fun main(args: Array<String>) {
     SpringApplication.run(Bootstrap::class.java, *args)
@@ -50,14 +55,26 @@ class EdgarImpl(
         private val filedDocumentRepository: FiledDocumentRepository): Edgar {
     override fun execute(vararg args: String) {
         val arguments: Arguments = try {cmdParser.parse(*args)} catch(e: ParseException) {
-            val n = System.lineSeparator()
-            System.err.println("${e.message + n}")
-            HelpFormatter().printHelp(appName, "Download documents filed with Edgar$n$n",
-                    cmdParser.options,
-                    "${n}Please report issues at https://github.com/nryotaro/edgar-crawler",
-                    true)
+            System.err.println("${e.message + System.lineSeparator()}")
+            printHelp()
             null
         } ?: return
+       
+        val c: Mono<Indices> = indexRepository.retrieve(arguments.date)
+        val d: Flux<Index> = c.flatMapIterable { it.indices }
+        val e: Flux<FilingDetail> = d.flatMap { filingDetailRepository.retrieve(it)}
+        e.subscribe({
+            println("fin")
+        })
+        Thread.sleep(10000)
+    }
+
+    private fun printHelp() {
+        val n = System.lineSeparator()
+        HelpFormatter().printHelp(appName, "Download documents filed with Edgar$n$n",
+                cmdParser.options,
+                "${n}Please report issues at https://github.com/nryotaro/edgar-crawler",
+                true)
     }
 }
 

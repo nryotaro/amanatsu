@@ -8,7 +8,19 @@
     </encoder>
   </appender>
 
+  <appender name="VERBOSE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+  </appender>
+
   <logger name="org.springframework" level="ERROR"/>
+
+  <logger name="verbose" level="INFO" additivity="false">
+    <appender-ref ref="VERBOSE"/>
+  </logger>
+
+  <logger name="org.nryotaro.edgar.repository.IndexRepository" level="INFO"></logger>
 
   <root level="ERROR">
     <appender-ref ref="STDOUT" />
