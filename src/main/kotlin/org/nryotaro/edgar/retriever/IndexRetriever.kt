@@ -1,4 +1,4 @@
-package org.nryotaro.edgar.repository
+package org.nryotaro.edgar.retriever
 
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.index.Indices
@@ -15,13 +15,11 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import reactor.core.publisher.Mono
-import java.io.File
-import java.nio.channels.AsynchronousFileChannel
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 @Component
-class IndexRepository(private val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String,
-                      private val parser: IndexParser) {
+class IndexRetriever(private val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String,
+                     private val parser: IndexParser) {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun  retrieve(date: LocalDate): Mono<Indices> {

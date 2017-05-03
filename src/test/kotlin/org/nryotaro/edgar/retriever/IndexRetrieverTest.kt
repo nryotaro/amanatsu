@@ -1,7 +1,6 @@
-package org.nryotaro.edgar.repository
+package org.nryotaro.edgar.retriever
 
 import org.hamcrest.core.Is.`is`
-import org.junit.Assert
 import org.junit.Assert.assertThat
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -17,10 +16,10 @@ import reactor.core.publisher.Mono
 import java.time.LocalDate
 
 
-class IndexRepositoryTest : EdgarTest() {
+class IndexRetrieverTest : EdgarTest() {
 
     @Autowired
-    lateinit var indexRepository: IndexRepository
+    lateinit var indexRepository: IndexRetriever
 
     @MockBean
     lateinit var client: EdgarClient

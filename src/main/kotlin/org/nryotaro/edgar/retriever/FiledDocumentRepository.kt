@@ -1,10 +1,8 @@
-package org.nryotaro.edgar.repository
+package org.nryotaro.edgar.retriever
 
 import org.nryotaro.edgar.client.EdgarClient
 import org.springframework.stereotype.Repository
-import org.springframework.web.reactive.function.BodyExtractors
 import java.io.File
-import javax.validation.ReportAsSingleViolation
 
 @Repository
 class FiledDocumentRepository(private val client: EdgarClient) {

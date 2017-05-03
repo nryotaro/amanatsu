@@ -1,4 +1,4 @@
-package org.nryotaro.edgar.repository
+package org.nryotaro.edgar.retriever
 
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat

@@ -2,7 +2,6 @@ package org.nryotaro.edgar
 
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.ParseException
-import org.nryotaro.edgar.annotation.qualifier.MainRunner
 import org.nryotaro.edgar.client.EdgarClientContext
 import org.nryotaro.edgar.cmdparser.CmdParser
 import org.nryotaro.edgar.cmdparser.CommandContext
@@ -10,16 +9,14 @@ import org.nryotaro.edgar.plain.cmd.Arguments
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
 import org.nryotaro.edgar.plain.index.Index
 import org.nryotaro.edgar.plain.index.Indices
-import org.nryotaro.edgar.repository.FiledDocumentRepository
-import org.nryotaro.edgar.repository.FilingDetailRepository
-import org.nryotaro.edgar.repository.IndexRepository
-import org.springframework.beans.factory.annotation.Qualifier
+import org.nryotaro.edgar.retriever.FiledDocumentRepository
+import org.nryotaro.edgar.retriever.FilingDetailRepository
+import org.nryotaro.edgar.retriever.IndexRetriever
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
 import org.springframework.boot.SpringApplication
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
@@ -50,7 +47,7 @@ interface Edgar {
 class EdgarImpl(
         @Value("\${spring.application.name}") val appName: String,
         private val cmdParser: CmdParser,
-        private val indexRepository: IndexRepository,
+        private val indexRepository: IndexRetriever,
         private val filingDetailRepository: FilingDetailRepository,
         private val filedDocumentRepository: FiledDocumentRepository): Edgar {
     override fun execute(vararg args: String) {

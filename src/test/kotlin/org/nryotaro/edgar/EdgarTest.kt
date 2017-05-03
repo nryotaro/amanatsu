@@ -1,20 +1,16 @@
 package org.nryotaro.edgar
 
-import org.assertj.core.api.Assertions
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
-import org.junit.ClassRule
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
 import org.nryotaro.edgar.annotation.qualifier.MainRunner
-import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.cmdparser.CmdParser
-import org.nryotaro.edgar.repository.FiledDocumentRepository
-import org.nryotaro.edgar.repository.FilingDetailRepository
-import org.nryotaro.edgar.repository.IndexRepository
+import org.nryotaro.edgar.retriever.FiledDocumentRepository
+import org.nryotaro.edgar.retriever.FilingDetailRepository
+import org.nryotaro.edgar.retriever.IndexRetriever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
@@ -26,8 +22,6 @@ import org.springframework.stereotype.Service
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.web.reactive.function.client.ClientResponse
-import reactor.core.publisher.Mono
-import java.time.temporal.TemporalField
 import kotlin.reflect.KClass
 
 @RunWith(SpringRunner::class)
@@ -57,7 +51,7 @@ open class EdgarRunnerConfiguration {
     open fun edgar(
             @Value("\${spring.application.name}") appName: String,
             cmdParser: CmdParser,
-            indexRepository: IndexRepository,
+            indexRepository: IndexRetriever,
             filingDetailRepository: FilingDetailRepository,
             filedDocumentRepository: FiledDocumentRepository): Edgar {
         return EdgarImpl(appName, cmdParser, indexRepository,
