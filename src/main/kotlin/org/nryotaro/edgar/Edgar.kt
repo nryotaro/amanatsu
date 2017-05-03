@@ -57,7 +57,7 @@ class EdgarImpl(
             null
         } ?: return
        
-        val c: Mono<Indices> = indexRepository.retrieve(arguments.date)
+        val c: Mono<Indices> = indexRepository.retrieve(arguments.date, arguments.destination)
         val d: Flux<Index> = c.flatMapIterable { it.indices }
         val e: Flux<FilingDetail> = d.flatMap { filingDetailRepository.retrieve(it)}
         e.subscribe({

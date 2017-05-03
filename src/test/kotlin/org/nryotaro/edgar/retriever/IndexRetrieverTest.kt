@@ -34,7 +34,9 @@ class IndexRetrieverTest : EdgarTest() {
                 .thenReturn(Mono.just(readTextFile("crawler.20170314.idx", this::class)))
         `when`(client.getRawResponse("Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx"))
                 .thenReturn(Mono.just(clientResponse))
-        val indices: Indices =  indexRepository.retrieve(LocalDate.parse("2017-03-14")).block()
+
+        val dest = createTempDir()
+        val indices: Indices =  indexRepository.retrieve(LocalDate.parse("2017-03-14"), dest).block()
 
         assertThat(indices.filedDate, `is`(LocalDate.parse("2017-03-14")))
         assertThat(indices.indices,

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import reactor.core.publisher.Mono
+import java.io.File
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 @Component
@@ -22,28 +23,59 @@ class IndexRetriever(private val client: EdgarClient, @Value("\${url.dailyindex}
                      private val parser: IndexParser) {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun  retrieve(date: LocalDate): Mono<Indices> {
+    fun retrieve(date: LocalDate, destRoot: File, force: Boolean = false): Mono<Indices> {
+        val dest = File(destRoot, buildIndex(date))
+        val writer: (String) -> Unit = {
+            dest.parentFile.mkdirs()
+            dest.createNewFile()
+            dest.writeText(it)
+        }
+        return if(!force && dest.exists() && dest.isFile)  retrieve(dest, writer) else retrieve(date, writer)
+    }
 
-         return client.getRawResponse(buildIndex(date)).flatMap {
+    /*
+    fun retrieve(date: LocalDate, writer: (String) -> Unit, destRoot: File): Mono<Indices> {
+        val localDest =  File(destRoot, buildIndex(date))
+        return if(localDest.isFile) retrieve(localDest, writer) else retrieve(date, writer)
+    }
+    */
+
+    fun retrieve(date: LocalDate, writer: (String) -> Unit): Mono<Indices> {
+        return readFromRemote(buildIndex(date)).doOnNext(writer).flatMap { Mono.just(parser.parse(it))}
+    }
+    fun retrieve(localDest: File, writer: (String) -> Unit): Mono<Indices> {
+        return Mono.just(readFromLocal(localDest)).doOnNext(writer).flatMap{ Mono.just(parser.parse(it)) }
+    }
+
+    /*
+    private fun retrieve(text: Mono<String>, writer: (String) -> Unit): Mono<Indices> {
+        return text.doOnNext(writer).flatMap {Mono.just(parser.parse(it))}
+    }
+    */
+
+    private fun readFromRemote(path: String): Mono<String> {
+        return client.getRawResponse(path).flatMap {
               when(it.statusCode().series()) {
                  INFORMATIONAL -> TODO("information")
-                 SUCCESSFUL -> it.bodyToMono(String::class.java).flatMap{ Mono.just(parser.parse(it)) }
+                 SUCCESSFUL -> it.bodyToMono(String::class.java)
                  REDIRECTION -> TODO("redirection")
                  CLIENT_ERROR -> {
-                     log.info("the index submitted at $date doesn't exist")
+                     log.info(""""$path" doesn't exist""")
                      Mono.empty()}
                  SERVER_ERROR -> TODO("server error")
              }
         }
     }
+    private fun readFromLocal(file: File): String {
+        return file.readText()
+    }
 
-
-    fun buildIndex(date: LocalDate): String {
+    private fun buildIndex(date: LocalDate): String {
         return  dailyIndex + date.year.toString() + "/QTR" + calcQuarter(date) + "/crawler." +
                 date.format(DateTimeFormatter.BASIC_ISO_DATE) + ".idx"
     }
 
-    fun calcQuarter(date: LocalDate): Int {
+    private fun calcQuarter(date: LocalDate): Int {
         return when (date.monthValue) {
             1, 2, 3 -> 1
             4, 5, 6 -> 2
