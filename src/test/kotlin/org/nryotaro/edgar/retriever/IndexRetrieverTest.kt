@@ -65,4 +65,36 @@ class IndexRetrieverTest : EdgarTest() {
         verify(client, never()).getRawResponse(anyString())
 
     }
+
+    private fun prepareMockHttpHandle() {
+        `when`(clientResponse.statusCode()).thenReturn(HttpStatus.OK)
+        `when`(clientResponse.bodyToMono(String::class.java))
+                .thenReturn(Mono.just(readTextFile("crawler.20170314.idx", this::class)))
+        `when`(client.getRawResponse("Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx"))
+                .thenReturn(Mono.just(clientResponse))
+    }
+
+     @Test
+    fun forceRetrieve() {
+        `when`(clientResponse.statusCode()).thenReturn(HttpStatus.OK)
+        `when`(clientResponse.bodyToMono(String::class.java))
+                .thenReturn(Mono.just(readTextFile("crawler.20170314.idx", this::class)))
+        `when`(client.getRawResponse("Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx"))
+                .thenReturn(Mono.just(clientResponse))
+
+        val dest = File(createTempDir(), "Archives")
+        dest.mkdirs()
+        File(File(this.javaClass.getResource(".").toURI()), "Archives").copyRecursively(dest)
+        log.debug("the output directory: ${dest.parent}")
+
+        val indices: Indices =  indexRepository.retrieve(LocalDate.parse("2017-03-14"), dest, force = true).block()
+
+        assertThat(indices.filedDate, `is`(LocalDate.parse("2017-03-14")))
+        assertThat(indices.indices,
+                `is`(listOf(Index("1ST SOURCE CORP","DEF 14A", 34782,LocalDate.parse("2017-03-14"),
+                        "http://www.sec.gov/Archives/edgar/data/34782/0000034782-17-000039-index.htm"))))
+
+        assertThat(File(dest, "Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx").exists(), `is`(true))
+        verify(client, times(1)).getRawResponse(anyString())
+    }
 }
