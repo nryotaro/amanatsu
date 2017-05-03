@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
 import org.junit.ClassRule
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -69,12 +70,15 @@ class EdgarBootstrapTest : EdgarTest() {
     val help ="""
     |Missing argument for option: d
     |
-    |usage: edgar-crawler -d <arg> -o <arg>
+    |usage: edgar-crawler -d <arg> [-f] -o <arg>
     |Download documents filed with Edgar
     |
-    | -d,--date <arg>               the crawler retrieves the documents
+    | -d,--date <arg>               The crawler retrieves the documents
     |                               submitted on the specified date
-    | -o,--output-directory <arg>   retrieved documents will be stored in the
+    | -f,--force                    Download indices and filed documents even
+    |                               if they have already existed in the
+    |                               specified destination
+    | -o,--output-directory <arg>   Retrieved documents will be stored in the
     |                               specified directory
     |
     |Please report issues at https://github.com/nryotaro/edgar-crawler
@@ -85,8 +89,8 @@ class EdgarBootstrapTest : EdgarTest() {
         edgar.execute("-d")
         assertThat(outputCapture.toString(), `is`(help))
     }
+
     @Test fun indexNotFound() {
         edgar.execute("-d", "2017-04-29", "-o", "/home/")
-        assertThat(outputCapture.toString(), `is`(help))
     }
 }

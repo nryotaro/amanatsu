@@ -20,10 +20,13 @@ class CommandContext {
 
     @Bean fun options(): Options {
         val options: Options = Options()
+
+        options.addOption(Option.builder("f").optionalArg(true).longOpt("force").desc("Download indices and filed documents even " +
+                "if they have already existed in the specified destination").build())
         options.addOption(
-                buildOption("d", "date", true, "the crawler retrieves the documents submitted on the specified date"))
+                buildOption("d", "date", true, "The crawler retrieves the documents submitted on the specified date"))
         options.addOption(
-                buildOption("o", "output-directory", true, "retrieved documents will be stored in the specified directory"))
+                buildOption("o", "output-directory", true, "Retrieved documents will be stored in the specified directory"))
 
         return options
     }
