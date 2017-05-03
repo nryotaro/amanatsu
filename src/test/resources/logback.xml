@@ -20,7 +20,7 @@
     <appender-ref ref="VERBOSE"/>
   </logger>
 
-  <logger name="org.nryotaro.edgar.retriever.IndexRetriever" level="INFO"></logger>
+  <logger name="org.nryotaro.edgar" level="debug"></logger>
 
   <root level="ERROR">
     <appender-ref ref="STDOUT" />

@@ -1,3 +1,6 @@
+# Mac OSX
+.DS_Store
+# java
 *.class
 
 # Mobile Tools for Java (J2ME)
