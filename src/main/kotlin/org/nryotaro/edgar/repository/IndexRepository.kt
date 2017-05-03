@@ -15,13 +15,14 @@ import org.springframework.stereotype.Component
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import reactor.core.publisher.Mono
+import java.io.File
+import java.nio.channels.AsynchronousFileChannel
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 @Component
 class IndexRepository(private val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String,
                       private val parser: IndexParser) {
     val log: Logger = LoggerFactory.getLogger(this::class.java)
-    val verboseLog: Logger = LoggerFactory.getLogger("verbose")
 
     fun  retrieve(date: LocalDate): Mono<Indices> {
 
@@ -31,13 +32,13 @@ class IndexRepository(private val client: EdgarClient, @Value("\${url.dailyindex
                  SUCCESSFUL -> it.bodyToMono(String::class.java).flatMap{ Mono.just(parser.parse(it)) }
                  REDIRECTION -> TODO("redirection")
                  CLIENT_ERROR -> {
-                     log.info("the index of $date was not submitted")
-                     verboseLog.info("help me!!")
+                     log.info("the index submitted at $date doesn't exist")
                      Mono.empty()}
                  SERVER_ERROR -> TODO("server error")
              }
         }
     }
+
 
     fun buildIndex(date: LocalDate): String {
         return  dailyIndex + date.year.toString() + "/QTR" + calcQuarter(date) + "/crawler." +

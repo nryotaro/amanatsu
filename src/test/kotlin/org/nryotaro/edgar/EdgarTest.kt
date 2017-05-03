@@ -8,7 +8,9 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.`when`
 import org.nryotaro.edgar.annotation.qualifier.MainRunner
+import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.cmdparser.CmdParser
 import org.nryotaro.edgar.repository.FiledDocumentRepository
 import org.nryotaro.edgar.repository.FilingDetailRepository
@@ -16,11 +18,16 @@ import org.nryotaro.edgar.repository.IndexRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.rule.OutputCapture
 import org.springframework.context.annotation.*
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.web.reactive.function.client.ClientResponse
+import reactor.core.publisher.Mono
+import java.time.temporal.TemporalField
 import kotlin.reflect.KClass
 
 @RunWith(SpringRunner::class)
@@ -90,7 +97,23 @@ class EdgarBootstrapTest : EdgarTest() {
         assertThat(outputCapture.toString(), `is`(help))
     }
 
+
+    @MockBean
+    lateinit var clientResponse: ClientResponse
+
     @Test fun indexNotFound() {
-        edgar.execute("-d", "2017-04-29", "-o", "/home/")
+        val tempDir = createTempDir()
+
+        edgar.execute("-d", "2017-03-14", "-o", tempDir.path)
+
+        `when`(clientResponse.statusCode()).thenReturn(HttpStatus.NOT_FOUND)
+        /*
+        `when`(clientResponse.bodyToMono(String::class.java))
+                .thenReturn(Mono.just(readTextFile("crawler.20170314.idx", this::class)))
+        `when`(client.getRawResponse("Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx"))
+                .thenReturn(Mono.just(clientResponse))
+        */
+        assertThat(tempDir.list().isEmpty(), `is`(true))
+
     }
 }

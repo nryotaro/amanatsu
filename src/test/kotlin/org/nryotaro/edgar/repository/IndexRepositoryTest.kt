@@ -37,11 +37,10 @@ class IndexRepositoryTest : EdgarTest() {
                 .thenReturn(Mono.just(clientResponse))
         val indices: Indices =  indexRepository.retrieve(LocalDate.parse("2017-03-14")).block()
 
-       assertThat(indices.filedDate, `is`(LocalDate.parse("2017-03-14")))
-       assertThat(indices.indices,
-               `is`(listOf(Index("1ST SOURCE CORP","DEF 14A", 34782,LocalDate.parse("2017-03-14"),
-              "http://www.sec.gov/Archives/edgar/data/34782/0000034782-17-000039-index.htm"))))
-
+        assertThat(indices.filedDate, `is`(LocalDate.parse("2017-03-14")))
+        assertThat(indices.indices,
+                `is`(listOf(Index("1ST SOURCE CORP","DEF 14A", 34782,LocalDate.parse("2017-03-14"),
+                        "http://www.sec.gov/Archives/edgar/data/34782/0000034782-17-000039-index.htm"))))
     }
 
 }

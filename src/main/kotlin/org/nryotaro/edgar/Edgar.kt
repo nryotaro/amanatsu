@@ -66,7 +66,6 @@ class EdgarImpl(
         e.subscribe({
             println("fin")
         })
-        Thread.sleep(10000)
     }
 
     private fun printHelp() {
