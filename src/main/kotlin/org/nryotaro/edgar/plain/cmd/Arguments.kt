@@ -5,4 +5,4 @@ import java.nio.file.Path
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-data class Arguments(val date: LocalDate, val destination: File)
+data class Arguments(val date: LocalDate, val destination: File, val overwrite: Boolean = false)

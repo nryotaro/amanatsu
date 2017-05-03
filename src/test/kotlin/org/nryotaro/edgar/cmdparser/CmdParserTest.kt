@@ -27,6 +27,11 @@ class CmdParserTest : EdgarTest(){
         val args =  parser.parse("-d", "2017-04-12", "-o", "/data")
         assertThat(args,`is`(Arguments(LocalDate.parse("2017-04-12"), File("/data"))) )
     }
+    @Test
+    fun parseArgumentsWithForce() {
+        val args =  parser.parse("-d", "2017-04-12", "-o", "/data", "-f")
+        assertThat(args,`is`(Arguments(LocalDate.parse("2017-04-12"), File("/data"), true)))
+    }
 
     @Test(expected = ParseException::class)
     fun parseMalformedArguments() {

@@ -41,7 +41,8 @@ class CmdParser(val options: Options) {
 
         val parsed: CommandLine = commandLineParser.parse(options, args)
 
-        return Arguments(LocalDate.parse(parsed.getOptionValue("d")), File(parsed.getOptionValue("o")))
-
+        return Arguments(LocalDate.parse(parsed.getOptionValue("d")),
+                File(parsed.getOptionValue("o")),
+                parsed.hasOption('f'))
     }
 }
