@@ -3,7 +3,8 @@ package org.nryotaro.edgar.retriever
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
 import org.junit.Test
-import org.mockito.Mockito.`when`
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.*
 import org.nryotaro.edgar.EdgarTest
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.index.Index
@@ -51,4 +52,17 @@ class IndexRetrieverTest : EdgarTest() {
         assertThat(File(dest, "Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx").exists(), `is`(true))
     }
 
+
+    @Test
+    fun retrieveFromLocal() {
+        val dest = File(this.javaClass.getResource(".").toURI())
+        val indices: Indices =  indexRepository.retrieve(LocalDate.parse("2017-03-14"), dest).block()
+
+        assertThat(indices.filedDate, `is`(LocalDate.parse("2017-03-14")))
+        assertThat(indices.indices,
+                `is`(listOf(Index("1ST SOURCE CORP","DEF 14A", 34782, LocalDate.parse("2017-03-14"),
+                        "http://www.sec.gov/Archives/edgar/data/34782/0000034782-17-000039-index.htm"))))
+        verify(client, never()).getRawResponse(anyString())
+
+    }
 }
