@@ -10,26 +10,27 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.io.File
+import java.net.URI
+import java.net.URL
 import java.nio.ByteBuffer
 
 @Repository
 class FilingDetailRetriever(
         private val client: EdgarClient,
-        private val filingDetailParser: FilingDetailParser,
-        @Value("\${url.root}") private val edgarRootUrl: String) {
+        private val filingDetailParser: FilingDetailParser) {
 
     fun retrieve(index: Index): Flux<FilingDetail> {
         return client.get(index.url).flatMapIterable{filingDetailParser.parse(it)}
     }
 
-    private fun retrieve(index: Index, destRoot: File, force: Boolean = false) {
-        val subDest = index.url.substringAfter(edgarRootUrl)
-        val dest = File(destRoot, subDest)
+    fun retrieve(index: Index, destRoot: File, force: Boolean = false): Flux<FilingDetail> {
+        val path =  URL(index.url).path.substringAfter("/")
+        val dest = File(destRoot, path)
 
-        if(!force && dest.exists() && dest.isFile)
+        return if(!force && dest.exists() && dest.isFile)
             retrieve(Mono.just(readFromLocal(dest)), {})
         else
-            retrieve(readFromRemote(subDest), {dest.parentFile.mkdirs(); dest.createNewFile(); dest.writeText(it)})
+            retrieve(readFromRemote(path), {dest.parentFile.mkdirs(); dest.createNewFile(); dest.writeText(it)})
     }
 
     private fun retrieve(text: Mono<String>, writer: (String) -> Unit): Flux<FilingDetail> {
