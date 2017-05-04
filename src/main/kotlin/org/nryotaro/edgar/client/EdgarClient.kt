@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Configurable
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.buffer.DataBuffer
+import org.springframework.core.io.buffer.DefaultDataBuffer
+import org.springframework.core.io.buffer.DefaultDataBufferFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.BodyExtractors
 import org.springframework.web.reactive.function.client.ClientResponse
@@ -18,6 +20,7 @@ import java.nio.channels.FileChannel
 import java.nio.file.OpenOption
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import java.util.function.Function
 
 @Configurable
 class EdgarClientContext {
@@ -66,9 +69,7 @@ class EdgarClientImpl(
      */
     override  fun download(url: String, path: Path): FileChannel {
         val chan = FileChannel.open(path, StandardOpenOption.WRITE)
-        val c: Flux<DataBuffer> = client.get().uri(url).exchange().flatMapMany {
-            it.body(BodyExtractors.toDataBuffers())
-        }
+
         client.get().uri(url).exchange().flatMapMany {
             it.body(BodyExtractors.toDataBuffers())
         }.subscribe({chan.write(it.asByteBuffer())},
@@ -78,6 +79,7 @@ class EdgarClientImpl(
         return chan
     }
 
+    @Deprecated("cut by yourself")
     private fun cutEdgarRootUrl(url: String): String {
         return url.substringAfter(edgarRootUrl)
     }
