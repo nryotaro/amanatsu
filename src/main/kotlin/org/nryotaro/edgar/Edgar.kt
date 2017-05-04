@@ -11,6 +11,7 @@ import org.nryotaro.edgar.plain.index.Index
 import org.nryotaro.edgar.retriever.FiledDocumentRetriever
 import org.nryotaro.edgar.retriever.FilingDetailRetriever
 import org.nryotaro.edgar.retriever.IndexRetriever
+import org.nryotaro.edgar.service.FiledDocumentService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -47,7 +48,7 @@ class EdgarImpl(
         private val cmdParser: CmdParser,
         private val indexRepository: IndexRetriever,
         private val filingDetailRepository: FilingDetailRetriever,
-        private val filedDocumentRepository: FiledDocumentRetriever): Edgar {
+        private val filedDocumentService: FiledDocumentService): Edgar {
     override fun execute(vararg args: String) {
         val arguments: Arguments = try {cmdParser.parse(*args)} catch(e: ParseException) {
             System.err.println("${e.message + System.lineSeparator()}")
@@ -59,7 +60,8 @@ class EdgarImpl(
                 arguments.destination, arguments.overwrite).flatMapIterable { it.indices }
         val filingDetails: Flux<FilingDetail>
                 = indices.flatMap { filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}
-        //filingDetails.map{filedDocumentRepository.retrieve(it.document.url, arguments.destination, arguments.overwrite)}
+
+        filedDocumentService.blockCollect(filingDetails, arguments.destination, arguments.overwrite)
     }
 
     private fun printHelp() {

@@ -1,10 +1,13 @@
 package org.nryotaro.edgar.retriever
 
 import org.nryotaro.edgar.client.EdgarClient
+import org.nryotaro.edgar.plain.filingdetail.Document
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
 import org.nryotaro.edgar.plain.index.Index
 import org.nryotaro.edgar.text.FilingDetailParser
 import org.reactivestreams.Publisher
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
@@ -19,7 +22,10 @@ class FilingDetailRetriever(
         private val client: EdgarClient,
         private val filingDetailParser: FilingDetailParser) {
 
+    val log: Logger = LoggerFactory.getLogger(FilingDetailParser::class.java)
+    
     fun retrieve(index: Index, destRoot: File, force: Boolean = false): Flux<FilingDetail> {
+        //log.debug("""retrieve $index""")
         val path =  URL(index.url).path.substringAfter("/")
         val dest = File(destRoot, path)
 
@@ -30,7 +36,8 @@ class FilingDetailRetriever(
     }
 
     private fun retrieve(text: Mono<String>, writer: (String) -> Unit): Flux<FilingDetail> {
-        return text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}
+        val c: Flux<FilingDetail> = text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}.onErrorResume{Flux.just(FilingDetail(null, "", Document("", ""), "", 1))}
+        return text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}.onErrorResume {Mono.just(FilingDetail(null, "", Document("", ""), "", 1) )}
     }
 
     private fun readFromLocal(file: File): String {

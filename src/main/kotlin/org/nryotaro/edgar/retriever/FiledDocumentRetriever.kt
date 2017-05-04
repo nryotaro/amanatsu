@@ -11,6 +11,8 @@ import java.nio.file.Paths
 class FiledDocumentRetriever(private val client: EdgarClient) {
 
     fun retrieve(documentUrl: String, dest: File): FileChannel {
+        dest.parentFile.mkdirs()
+        dest.createNewFile()
         return client.download(documentUrl, Paths.get(dest.toURI()))
     }
 }

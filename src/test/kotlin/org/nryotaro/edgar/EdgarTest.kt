@@ -11,6 +11,9 @@ import org.nryotaro.edgar.cmdparser.CmdParser
 import org.nryotaro.edgar.retriever.FiledDocumentRetriever
 import org.nryotaro.edgar.retriever.FilingDetailRetriever
 import org.nryotaro.edgar.retriever.IndexRetriever
+import org.nryotaro.edgar.service.FiledDocumentService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
@@ -53,13 +56,14 @@ open class EdgarRunnerConfiguration {
             cmdParser: CmdParser,
             indexRepository: IndexRetriever,
             filingDetailRepository: FilingDetailRetriever,
-            filedDocumentRepository: FiledDocumentRetriever): Edgar {
+            filedDocumentService: FiledDocumentService): Edgar {
         return EdgarImpl(appName, cmdParser, indexRepository,
-                filingDetailRepository, filedDocumentRepository)
+                filingDetailRepository, filedDocumentService)
     }
 }
 
 class EdgarBootstrapTest : EdgarTest() {
+    val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     @Autowired
     @MainRunner
@@ -92,25 +96,6 @@ class EdgarBootstrapTest : EdgarTest() {
     }
 
 
-    @MockBean
-    lateinit var clientResponse: ClientResponse
 
-    /**
-     * FIXME
-     */
-    @Test fun indexNotFound() {
-        val tempDir = createTempDir()
 
-        edgar.execute("-d", "2017-03-14", "-o", tempDir.path)
-
-        `when`(clientResponse.statusCode()).thenReturn(HttpStatus.NOT_FOUND)
-        /*
-        `when`(clientResponse.bodyToMono(String::class.java))
-                .thenReturn(Mono.just(readTextFile("crawler.20170314.idx", this::class)))
-        `when`(client.getRawResponse("Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx"))
-                .thenReturn(Mono.just(clientResponse))
-        */
-        assertThat(tempDir.list().isEmpty(), `is`(true))
-
-    }
 }

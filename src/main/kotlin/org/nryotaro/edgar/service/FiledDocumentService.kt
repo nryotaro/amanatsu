@@ -15,13 +15,25 @@ class FiledDocumentService(private val retriever: FiledDocumentRetriever) {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun collect(details: Flux<FilingDetail>, destRoot: File, force: Boolean = false): Flux<FileChannel> {
-
+    private fun collect(details: Flux<FilingDetail>, destRoot: File, force: Boolean = false): Flux<Triple<String, File,FileChannel>> {
         return details.map{Pair(it.document.url, File(destRoot, it.document.url))}
                 .filter { force || !it.second.exists() }.map {
-            retriever.retrieve(it.first, it.second)
+            Triple(it.first, it.second, retriever.retrieve(it.first, it.second))
         }
     }
+    
+    fun blockCollect(details: Flux<FilingDetail>, destRoot: File, force: Boolean = false) {
+        f(collect(details, destRoot, force).toIterable().toList())
+    }
 
-
+    private tailrec fun f(chans: List<Triple<String, File,FileChannel>>): List<Triple<String, File, FileChannel>> {
+        if(chans.isEmpty())
+            return listOf<Triple<String, File,FileChannel>>()
+        return f(chans.filter {
+            if(!it.third.isOpen && it.second.exists()) {
+                log.debug(""""${it.first}" was successfully downloaded""")
+                false
+            } else true
+        })
+    }
 }
