@@ -77,7 +77,6 @@ class EdgarClientImpl(
         return chan
     }
 
-    @Deprecated("cut by yourself")
     private fun cutEdgarRootUrl(url: String): String {
         return url.substringAfter(edgarRootUrl)
     }

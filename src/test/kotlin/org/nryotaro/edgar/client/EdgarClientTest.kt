@@ -81,10 +81,4 @@ class EdgarClientTest: EdgarTest() {
 
     }
 
-    private fun build(vararg  args: ByteArray): Flux<DataBuffer> {
-        val c: List<DataBuffer> =args.map{
-            DefaultDataBufferFactory().wrap(ByteBuffer.wrap(it))
-            }
-        return Mono.just(c).flatMapIterable { it }
-    }
 }
