@@ -61,4 +61,30 @@ class EdgarClientTest: EdgarTest() {
 
         assertThat(File(dest.toUri()).readText(), `is`("a"))
     }
+    @Test
+    fun downloadOnError() {
+        val dest = Paths.get(createTempFile().toURI())
+
+        log.debug("$dest")
+
+        `when`(client.get()).thenReturn(spec)
+        `when`(spec.uri(anyString())).thenReturn(reqSpec)
+        `when`(reqSpec.exchange()).thenReturn(Mono.just(resp))
+
+        `when`(resp.body(BodyExtractors.toDataBuffers()))
+                .thenThrow(RuntimeException())
+
+        val c  = edgarClient.download("exist/path", dest)
+        while(c.isOpen) {}
+
+        assertThat(dest.toFile().exists(), `is`(false))
+
+    }
+
+    private fun build(vararg  args: ByteArray): Flux<DataBuffer> {
+        val c: List<DataBuffer> =args.map{
+            DefaultDataBufferFactory().wrap(ByteBuffer.wrap(it))
+            }
+        return Mono.just(c).flatMapIterable { it }
+    }
 }

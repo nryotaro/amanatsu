@@ -64,9 +64,6 @@ class EdgarClientImpl(
         }.reduce{acc, b -> acc.write(b)}
     }
 
-    /**
-     * TODO write tests
-     */
     override  fun download(url: String, path: Path): FileChannel {
         val chan = FileChannel.open(path, StandardOpenOption.WRITE)
 
@@ -74,7 +71,8 @@ class EdgarClientImpl(
             it.body(BodyExtractors.toDataBuffers())
         }.subscribe({chan.write(it.asByteBuffer())},
                 {log.error("""Failed to download "$url"""")
-                    chan.close()},
+                    chan.close()
+                    path.toFile().delete()},
                 {chan.close()})
         return chan
     }
