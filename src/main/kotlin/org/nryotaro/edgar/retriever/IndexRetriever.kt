@@ -19,18 +19,17 @@ import java.io.File
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 @Component
-class IndexRetriever(private val client: EdgarClient, @Value("\${url.dailyindex}") private val dailyIndex: String,
-                     private val parser: IndexParser) {
+class IndexRetriever(
+        private val client: EdgarClient,
+        @Value("\${url.dailyindex}") private val dailyIndex: String,
+        private val parser: IndexParser) {
+
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun retrieve(date: LocalDate, destRoot: File, force: Boolean = false): Mono<Indices> {
         val dest = File(destRoot, buildIndex(date))
-        val writer: (String) -> Unit = {
-            dest.parentFile.mkdirs()
-            dest.createNewFile()
-            dest.writeText(it)
-        }
-        return if(!force && dest.exists() && dest.isFile) retrieve(dest, {}) else retrieve(date, writer)
+        return if(!force && dest.exists() && dest.isFile) retrieve(dest, {})
+        else retrieve(date, {dest.parentFile.mkdirs(); dest.createNewFile(); dest.writeText(it)})
     }
 
     private fun retrieve(date: LocalDate, writer: (String) -> Unit): Mono<Indices> {

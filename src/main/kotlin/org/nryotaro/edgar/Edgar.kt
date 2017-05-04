@@ -10,7 +10,7 @@ import org.nryotaro.edgar.plain.filingdetail.FilingDetail
 import org.nryotaro.edgar.plain.index.Index
 import org.nryotaro.edgar.plain.index.Indices
 import org.nryotaro.edgar.retriever.FiledDocumentRepository
-import org.nryotaro.edgar.retriever.FilingDetailRepository
+import org.nryotaro.edgar.retriever.FilingDetailRetriever
 import org.nryotaro.edgar.retriever.IndexRetriever
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
@@ -48,7 +48,7 @@ class EdgarImpl(
         @Value("\${spring.application.name}") val appName: String,
         private val cmdParser: CmdParser,
         private val indexRepository: IndexRetriever,
-        private val filingDetailRepository: FilingDetailRepository,
+        private val filingDetailRepository: FilingDetailRetriever,
         private val filedDocumentRepository: FiledDocumentRepository): Edgar {
     override fun execute(vararg args: String) {
         val arguments: Arguments = try {cmdParser.parse(*args)} catch(e: ParseException) {

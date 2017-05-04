@@ -13,18 +13,19 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 
-class FilingDetailRepositoryTest : EdgarTest() {
+class FilingDetailRetrieverTest : EdgarTest() {
 
     @Autowired
-    lateinit var filingDetailRepository: FilingDetailRepository
+    lateinit var filingDetailRepository: FilingDetailRetriever
 
     @MockBean
     lateinit var client: EdgarClient
 
-    @Test fun retrieve() {
+    @Test
+    fun retrieve() {
         val url = "http://www.sec.gov/Archives/edgar/data/34782/0000034782-17-000039-index.htm"
         `when`(client.get(url)).thenReturn(
-                Mono.just(readTextFile("0001209191-17-028829-index.htm", FilingDetailRepositoryTest::class)))
+                Mono.just(readTextFile("0001209191-17-028829-index.htm", FilingDetailRetrieverTest::class)))
 
         val details = filingDetailRepository.retrieve(Index(
                 companyName = "1ST SOURCE CORP",

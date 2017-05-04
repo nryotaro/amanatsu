@@ -2,7 +2,6 @@ package org.nryotaro.edgar
 
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -10,7 +9,7 @@ import org.mockito.Mockito.`when`
 import org.nryotaro.edgar.annotation.qualifier.MainRunner
 import org.nryotaro.edgar.cmdparser.CmdParser
 import org.nryotaro.edgar.retriever.FiledDocumentRepository
-import org.nryotaro.edgar.retriever.FilingDetailRepository
+import org.nryotaro.edgar.retriever.FilingDetailRetriever
 import org.nryotaro.edgar.retriever.IndexRetriever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -53,7 +52,7 @@ open class EdgarRunnerConfiguration {
             @Value("\${spring.application.name}") appName: String,
             cmdParser: CmdParser,
             indexRepository: IndexRetriever,
-            filingDetailRepository: FilingDetailRepository,
+            filingDetailRepository: FilingDetailRetriever,
             filedDocumentRepository: FiledDocumentRepository): Edgar {
         return EdgarImpl(appName, cmdParser, indexRepository,
                 filingDetailRepository, filedDocumentRepository)

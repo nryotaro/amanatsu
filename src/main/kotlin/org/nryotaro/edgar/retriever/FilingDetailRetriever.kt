@@ -13,7 +13,7 @@ import java.io.File
 import java.nio.ByteBuffer
 
 @Repository
-class FilingDetailRepository(
+class FilingDetailRetriever(
         private val client: EdgarClient,
         private val filingDetailParser: FilingDetailParser,
         @Value("\${url.root}") private val edgarRootUrl: String) {
@@ -22,18 +22,14 @@ class FilingDetailRepository(
         return client.get(index.url).flatMapIterable{filingDetailParser.parse(it)}
     }
 
-    private fun retrieve (index: Index, destRoot: File, force: Boolean = false) {
+    private fun retrieve(index: Index, destRoot: File, force: Boolean = false) {
         val subDest = index.url.substringAfter(edgarRootUrl)
         val dest = File(destRoot, subDest)
-        val writer: (String) -> Unit = {
-            dest.parentFile.mkdirs()
-            dest.createNewFile()
-            dest.writeText(it)
-        }
+
         if(!force && dest.exists() && dest.isFile)
             retrieve(Mono.just(readFromLocal(dest)), {})
         else
-            retrieve(readFromRemote(subDest), writer)
+            retrieve(readFromRemote(subDest), {dest.parentFile.mkdirs(); dest.createNewFile(); dest.writeText(it)})
     }
 
     private fun retrieve(text: Mono<String>, writer: (String) -> Unit): Flux<FilingDetail> {

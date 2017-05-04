@@ -70,6 +70,9 @@ class IndexRetrieverTest : EdgarTest() {
                 .thenReturn(Mono.just(clientResponse))
     }
 
+    /**
+     * Download the specified files though they exist at the local directory.
+     */
     @Test
     fun forceRetrieve() {
         prepareMockHttpHandle()
