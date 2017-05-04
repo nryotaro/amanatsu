@@ -30,14 +30,14 @@ class IndexRetriever(private val client: EdgarClient, @Value("\${url.dailyindex}
             dest.createNewFile()
             dest.writeText(it)
         }
-        return if(!force && dest.exists() && dest.isFile) retrieve(dest, writer) else retrieve(date, writer)
+        return if(!force && dest.exists() && dest.isFile) retrieve(dest, {}) else retrieve(date, writer)
     }
 
-    fun retrieve(date: LocalDate, writer: (String) -> Unit): Mono<Indices> {
+    private fun retrieve(date: LocalDate, writer: (String) -> Unit): Mono<Indices> {
         return readFromRemote(buildIndex(date)).doOnNext(writer).flatMap { Mono.just(parser.parse(it))}
     }
 
-    fun retrieve(localDest: File, writer: (String) -> Unit): Mono<Indices> {
+    private fun retrieve(localDest: File, writer: (String) -> Unit): Mono<Indices> {
         return Mono.just(readFromLocal(localDest)).doOnNext(writer).flatMap{ Mono.just(parser.parse(it)) }
     }
 

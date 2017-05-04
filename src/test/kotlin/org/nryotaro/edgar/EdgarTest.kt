@@ -2,6 +2,7 @@ package org.nryotaro.edgar
 
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertThat
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

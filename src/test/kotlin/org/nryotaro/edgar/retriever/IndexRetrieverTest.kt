@@ -35,7 +35,7 @@ class IndexRetrieverTest : EdgarTest() {
     @Test
     fun retrieve() {
         prepareMockHttpHandle()
-        
+
         val dest = createTempDir()
         log.debug("the output directory: ${dest}")
         val indices: Indices =  indexRepository.retrieve(LocalDate.parse("2017-03-14"), dest).block()
