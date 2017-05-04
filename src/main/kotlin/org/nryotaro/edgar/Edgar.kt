@@ -60,10 +60,9 @@ class EdgarImpl(
         val c: Mono<Indices> = indexRepository.retrieve(arguments.date,
                 arguments.destination, force = arguments.overwrite)
         val d: Flux<Index> = c.flatMapIterable { it.indices }
-        val e: Flux<FilingDetail> = d.flatMap { filingDetailRepository.retrieve(it)}
-        e.subscribe({
-            println("fin")
-        })
+        val e: Flux<FilingDetail>
+                = d.flatMap { filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}
+        e.map{filedDocumentRepository.retrieve(it.document.url, arguments.destination,force = arguments.overwrite)}
     }
 
     private fun printHelp() {

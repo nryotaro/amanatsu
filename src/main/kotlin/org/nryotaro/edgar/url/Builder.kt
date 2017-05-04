@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter
 
 
 @Service
+@Deprecated("unused")
 class Builder(@Value("\${url.dailyindex}") private val dailyindex: String) {
 
     fun buildIndex(date: LocalDate): String {

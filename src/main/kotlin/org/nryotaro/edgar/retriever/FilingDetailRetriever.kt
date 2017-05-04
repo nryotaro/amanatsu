@@ -19,10 +19,6 @@ class FilingDetailRetriever(
         private val client: EdgarClient,
         private val filingDetailParser: FilingDetailParser) {
 
-    fun retrieve(index: Index): Flux<FilingDetail> {
-        return client.get(index.url).flatMapIterable{filingDetailParser.parse(it)}
-    }
-
     fun retrieve(index: Index, destRoot: File, force: Boolean = false): Flux<FilingDetail> {
         val path =  URL(index.url).path.substringAfter("/")
         val dest = File(destRoot, path)

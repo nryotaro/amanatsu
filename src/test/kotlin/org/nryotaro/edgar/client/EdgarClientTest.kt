@@ -2,6 +2,7 @@ package org.nryotaro.edgar.client
 
 import org.junit.Test
 import org.nryotaro.edgar.EdgarTest
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import java.io.File
 import java.nio.ByteBuffer
@@ -13,20 +14,16 @@ class EdgarClientTest: EdgarTest() {
     @Autowired
     lateinit var edgarClient: EdgarClient
 
+    val log =  LoggerFactory.getLogger(this::class.java)
     @Test
-    fun getBin() {
-        File("/Users/nryotaro/hoge.png").createNewFile()
+    fun download() {
+        val dest = Paths.get(createTempFile().toURI())
 
-        /*
-        FileChannel.open(Paths.get("/Users/nryotaro/hoge.png"), StandardOpenOption.WRITE)
-                .write(edgarClient.getBin(
-                        "Archives/edgar/data/34782/000003478217000039/a1stsourcecorplogo2a03.jpg").block().asByteBuffer())
-                        */
+        log.debug("$dest")
 
-        edgarClient.download("Archives/edgar/data/34782/000003478217000039/a1stsourcecorplogo2a03.jpg",
-                Paths.get("/Users/nryotaro/hoge.png"))
+        val c  = edgarClient.download("/Archives/edgar/data/34782/000003478217000039/a1stsourcecorplogo2a03.jpg",
+                dest)
 
-        Thread.sleep(1000*10)
-
+        while(c.isOpen) {}
     }
 }
