@@ -64,7 +64,10 @@ class EdgarClientImpl(
         }.reduce{acc, b -> acc.write(b)}
     }
 
-    override  fun download(url: String, path: Path): FileChannel {
+    /**
+     * TODO Path -> file
+     */
+    override fun download(url: String, path: Path): FileChannel {
         val chan = FileChannel.open(path, StandardOpenOption.WRITE)
 
         client.get().uri(url).exchange().flatMapMany {

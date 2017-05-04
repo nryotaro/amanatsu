@@ -8,8 +8,7 @@ import org.nryotaro.edgar.cmdparser.CommandContext
 import org.nryotaro.edgar.plain.cmd.Arguments
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
 import org.nryotaro.edgar.plain.index.Index
-import org.nryotaro.edgar.plain.index.Indices
-import org.nryotaro.edgar.retriever.FiledDocumentRepository
+import org.nryotaro.edgar.retriever.FiledDocumentRetriever
 import org.nryotaro.edgar.retriever.FilingDetailRetriever
 import org.nryotaro.edgar.retriever.IndexRetriever
 import org.springframework.beans.factory.annotation.Value
@@ -21,7 +20,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 
 fun main(args: Array<String>) {
     SpringApplication.run(Bootstrap::class.java, *args)
@@ -49,7 +47,7 @@ class EdgarImpl(
         private val cmdParser: CmdParser,
         private val indexRepository: IndexRetriever,
         private val filingDetailRepository: FilingDetailRetriever,
-        private val filedDocumentRepository: FiledDocumentRepository): Edgar {
+        private val filedDocumentRepository: FiledDocumentRetriever): Edgar {
     override fun execute(vararg args: String) {
         val arguments: Arguments = try {cmdParser.parse(*args)} catch(e: ParseException) {
             System.err.println("${e.message + System.lineSeparator()}")
@@ -57,12 +55,11 @@ class EdgarImpl(
             null
         } ?: return
 
-        val c: Mono<Indices> = indexRepository.retrieve(arguments.date,
-                arguments.destination, force = arguments.overwrite)
-        val d: Flux<Index> = c.flatMapIterable { it.indices }
-        val e: Flux<FilingDetail>
-                = d.flatMap { filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}
-        e.map{filedDocumentRepository.retrieve(it.document.url, arguments.destination,force = arguments.overwrite)}
+        val indices: Flux<Index> = indexRepository.retrieve(arguments.date,
+                arguments.destination, arguments.overwrite).flatMapIterable { it.indices }
+        val filingDetails: Flux<FilingDetail>
+                = indices.flatMap { filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}
+        //filingDetails.map{filedDocumentRepository.retrieve(it.document.url, arguments.destination, arguments.overwrite)}
     }
 
     private fun printHelp() {

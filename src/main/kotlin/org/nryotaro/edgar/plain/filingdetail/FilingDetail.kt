@@ -1,6 +1,7 @@
 package org.nryotaro.edgar.plain.filingdetail
 
 import com.sun.xml.internal.ws.transport.http.DeploymentDescriptorParser
+import java.net.URL
 
 
 data class Document(val filename: String, val url: String)

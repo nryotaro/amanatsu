@@ -8,7 +8,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
 import org.nryotaro.edgar.annotation.qualifier.MainRunner
 import org.nryotaro.edgar.cmdparser.CmdParser
-import org.nryotaro.edgar.retriever.FiledDocumentRepository
+import org.nryotaro.edgar.retriever.FiledDocumentRetriever
 import org.nryotaro.edgar.retriever.FilingDetailRetriever
 import org.nryotaro.edgar.retriever.IndexRetriever
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,7 +53,7 @@ open class EdgarRunnerConfiguration {
             cmdParser: CmdParser,
             indexRepository: IndexRetriever,
             filingDetailRepository: FilingDetailRetriever,
-            filedDocumentRepository: FiledDocumentRepository): Edgar {
+            filedDocumentRepository: FiledDocumentRetriever): Edgar {
         return EdgarImpl(appName, cmdParser, indexRepository,
                 filingDetailRepository, filedDocumentRepository)
     }
