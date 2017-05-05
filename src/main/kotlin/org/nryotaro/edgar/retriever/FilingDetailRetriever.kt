@@ -32,11 +32,13 @@ class FilingDetailRetriever(
         return if(!force && dest.exists() && dest.isFile)
             retrieve(Mono.just(readFromLocal(dest)), {})
         else
-            retrieve(readFromRemote(path), {dest.parentFile.mkdirs(); dest.createNewFile(); dest.writeText(it)})
+            retrieve(readFromRemote(path), {
+                dest.parentFile.mkdirs();
+                dest.createNewFile();
+                dest.writeText(it)})
     }
 
     private fun retrieve(text: Mono<String>, writer: (String) -> Unit): Flux<FilingDetail> {
-        val c: Flux<FilingDetail> = text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}.onErrorResume{Flux.just(FilingDetail(null, "", Document("", ""), "", 1))}
         return text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}.onErrorResume {Mono.just(FilingDetail(null, "", Document("", ""), "", 1) )}
     }
 

@@ -7,26 +7,38 @@ import org.springframework.context.annotation.Bean
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.core.io.buffer.DefaultDataBuffer
 import org.springframework.core.io.buffer.DefaultDataBufferFactory
+import org.springframework.http.client.reactive.ClientHttpRequest
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.BodyExtractors
-import org.springframework.web.reactive.function.client.ClientResponse
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
+import org.springframework.web.reactive.function.client.*
 import reactor.core.Disposable
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.ipc.netty.http.client.HttpClientException
 import java.io.File
 import java.nio.channels.FileChannel
 import java.nio.file.OpenOption
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import java.time.Duration
 import java.util.function.Function
 
 @Configurable
 class EdgarClientContext {
 
     @Bean fun client(@Value("\${url.root}") edgarRootUrl: String): WebClient {
-       return WebClient.create(edgarRootUrl)
+        return WebClient.builder().defaultHeader("Connection", "keep-alive").baseUrl(edgarRootUrl).build()
+        /*
+        val conn = ReactorClientHttpConnector()
+        val strategies = ExchangeStrategies.withDefaults()
+
+        return WebClient.builder().exchangeStrategies(strategies).baseUrl(edgarRootUrl)
+                .clientConnector(conn).defaultHeader("Connection", "keep-alive").exchangeFunction {
+            conn.connect(it.method(), it.url(),{a: ClientHttpRequest -> it.writeTo(a, strategies)}).map {
+            }
+        }.build()
+        */
     }
 
 }
@@ -45,14 +57,23 @@ class EdgarClientImpl(
 
     val log  = LoggerFactory.getLogger(this::class.java)
 
-    override  fun getRawResponse(url: String): Mono<ClientResponse> {
+    override fun getRawResponse(url: String): Mono<ClientResponse> {
        return client.get().uri(url).exchange()
     }
 
     override fun get(url: String): Mono<String> {
-        return client.get().uri(url).exchange().flatMap{
-            if(it.statusCode().is2xxSuccessful) it.bodyToMono(String::class) else Mono.empty()
+        return client.get().uri(url).exchange().
+                timeout(Duration.ofSeconds(10)).retry(3).onErrorResume {
+            if(it is HttpClientException) {
+                log.debug("${it.message()}")
+            }
+            log.debug("failed to get \"$url\" caused by $it")
+            Mono.empty()
+        }.
+                flatMap{
+            it.bodyToMono(String::class)
         }
+
     }
 
     /**

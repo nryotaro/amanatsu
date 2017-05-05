@@ -78,7 +78,7 @@ class EdgarClientTest: EdgarTest() {
         while(c.isOpen) {}
 
         assertThat(dest.toFile().exists(), `is`(false))
-
     }
+
 
 }
