@@ -17,33 +17,11 @@ class FiledDocumentService(private val retriever: FiledDocumentRetriever) {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-    fun collect(details: Flux<FilingDetail>, destRoot: File, force: Boolean = false): Flux<FileChannel> {
-        //f(collect(details.delayElements(Duration.ofMillis(100L)), destRoot, force).toIterable().toList())
+    fun collect(details: Flux<FilingDetail>, destRoot: File, force: Boolean = false): Flux<Boolean> {
         return details.doOnNext { log.debug("""download: ${it.document.url}""") }.delayElements(Duration.ofMillis(100L), Schedulers.single())
                 .map { Pair(it.document.url, File(destRoot, it.document.url)) }
                 .filter { force || !it.second.exists() }.flatMap {
             retriever.retrieve(it.first, it.second)
         }
     }
-
-    /*
-    private fun collect(details: Flux<FilingDetail>, destRoot: File, force: Boolean = false): Flux<FileChannel> {
-        return details.map{Pair(it.document.url, File(destRoot, it.document.url))}
-                .filter { force || !it.second.exists() }.map { retriever.retrieve(it.first, it.second)
-        }
-    }
-    */
-
-    /*
-    private tailrec fun f(chans: List<Triple<String, File,FileChannel>>): List<Triple<String, File, FileChannel>> {
-        if(chans.isEmpty())
-            return listOf<Triple<String, File,FileChannel>>()
-        return f(chans.filter {
-            if(!it.third.isOpen && it.second.exists()) {
-                log.debug(""""${it.first}" was successfully downloaded""")
-                false
-            } else true
-        })
-    }
-    */
 }

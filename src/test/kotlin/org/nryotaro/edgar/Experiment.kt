@@ -1,5 +1,6 @@
 package org.nryotaro.edgar
 
+import io.netty.channel.EventLoopGroup
 import org.junit.Test
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
 import reactor.core.publisher.Mono
 import java.io.File
 import java.time.Duration
@@ -65,5 +67,11 @@ class Experiment: EdgarTest() {
                 ff, false).flatMapIterable { it.indices }.filter{it.url != "http://www.sec.gov/Archives/edgar/data/740629/9999999997-17-002782-index.htm" && it.url != "http://www.sec.gov/Archives/edgar/data/1420522/9999999997-17-002867-index.htm"}
     }
     //
+
+    fun temp() {
+
+
+
+    }
 
 }

@@ -11,7 +11,7 @@ import java.nio.file.Paths
 @Repository
 class FiledDocumentRetriever(private val client: EdgarClient) {
 
-    fun retrieve(documentUrl: String, dest: File): Mono<FileChannel> {
+    fun retrieve(documentUrl: String, dest: File): Mono<Boolean> {
         dest.parentFile.mkdirs()
         dest.createNewFile()
         return client.download(documentUrl, Paths.get(dest.toURI()))

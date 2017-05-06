@@ -26,6 +26,7 @@ import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import java.time.Duration
 import java.util.concurrent.CountDownLatch
+import java.util.function.Consumer
 
 fun main(args: Array<String>) {
     SpringApplication.run(Bootstrap::class.java, *args)
@@ -68,16 +69,15 @@ class EdgarImpl(
                 arguments.destination, arguments.overwrite).flatMapIterable { it.indices }
 
         val filingDetails: Flux<FilingDetail>
-                = indices.delayElements(Duration.ofMillis(100L)).flatMap {
+                = indices.flatMap {
             filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}
 
-        val ii = filingDetails.toIterable().toList()
+        val ii = filingDetails.toIterable().toList().filter { it.document.url !=""}
         log.debug("the number of downloaded indices was ${ii.size}")
 
-        val c = filedDocumentService.collect(Flux.just(*ii.toTypedArray()),
+        filedDocumentService.collect(Flux.just(*ii.toTypedArray()),
                 arguments.destination, arguments.overwrite).blockLast()
-        //val c = filedDocumentService.collect(filingDetails, arguments.destination, arguments.overwrite).blockLast()
-        println(c)
+        println("fin")
     }
 
     private fun printHelp() {
