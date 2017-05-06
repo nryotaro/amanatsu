@@ -22,7 +22,7 @@
 
   <logger name="org.nryotaro.edgar" level="debug"></logger>
 
-  <root level="debug">
+  <root level="error">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>

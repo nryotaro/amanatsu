@@ -22,6 +22,7 @@ import java.nio.file.OpenOption
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.time.Duration
+import java.time.Duration.ofSeconds
 import java.util.function.Function
 
 @Configurable
@@ -47,7 +48,7 @@ interface EdgarClient {
     fun getRawResponse(url: String): Mono<ClientResponse>
     fun get(url: String): Mono<String>
     fun getBin(url: String): Mono<DataBuffer>
-    fun download(url: String, path: Path): FileChannel
+    fun download(url: String, path: Path): Mono<FileChannel>
 }
 
 @Service
@@ -58,22 +59,20 @@ class EdgarClientImpl(
     val log  = LoggerFactory.getLogger(this::class.java)
 
     override fun getRawResponse(url: String): Mono<ClientResponse> {
-       return client.get().uri(url).exchange()
+       return client.get().uri(url).exchange().timeout(ofSeconds(7L)).retry(3).onErrorResume {
+           log.warn("failed to get \"$url\" caused by $it")
+           Mono.empty()
+       }
     }
 
     override fun get(url: String): Mono<String> {
         return client.get().uri(url).exchange().
-                timeout(Duration.ofSeconds(10)).retry(3).onErrorResume {
-            if(it is HttpClientException) {
-                log.debug("${it.message()}")
-            }
-            log.debug("failed to get \"$url\" caused by $it")
+                timeout(ofSeconds(7L)).retry(3).onErrorResume {
+            log.warn("failed to get \"$url\" caused by $it")
             Mono.empty()
-        }.
-                flatMap{
+        }.flatMap{
             it.bodyToMono(String::class)
-        }
-
+        }.doOnNext{log.debug("downloaded: $url")}
     }
 
     /**
@@ -88,17 +87,35 @@ class EdgarClientImpl(
     /**
      * TODO Path -> file
      */
-    override fun download(url: String, path: Path): FileChannel {
+    override fun download(url: String, path: Path): Mono<FileChannel> {
         val chan = FileChannel.open(path, StandardOpenOption.WRITE)
 
-        client.get().uri(url).exchange().flatMapMany {
-            it.body(BodyExtractors.toDataBuffers())
-        }.subscribe({chan.write(it.asByteBuffer())},
-                {log.error("""Failed to download "$url"""")
+        return client.get().uri(url).exchange().timeout(ofSeconds(7L)).retry(2)
+                .onErrorResume {
+                    log.warn("failed to download \"$url\" due to $it")
+                    Mono.empty()
+                }
+                .flatMapMany {
+                    it.body(BodyExtractors.toDataBuffers())
+                }.doOnNext { chan.write(it.asByteBuffer())}.doOnError {
+            log.error("""Failed to write "$url" to $path""")
+            chan.close()
+            path.toFile().delete()
+        }.doOnNext {
+            if(!chan.isOpen){
+                log.debug("""$url was successfully downloaded""")
+                chan.close()
+            }
+        }.then(Mono.just(chan))
+        /*
+                subscribe({chan.write(it.asByteBuffer())},
+                {log.error("""Failed to write "$url" to $path""")
                     chan.close()
                     path.toFile().delete()},
                 {chan.close()})
+
         return chan
+                */
     }
 
     private fun cutEdgarRootUrl(url: String): String {

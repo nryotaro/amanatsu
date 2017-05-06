@@ -57,7 +57,7 @@ class EdgarClientTest: EdgarTest() {
         `when`(resp.body(BodyExtractors.toDataBuffers())).thenReturn(Flux.just(DefaultDataBufferFactory().wrap(arrays)))
 
         val c  = edgarClient.download("exist/path", dest)
-        while(c.isOpen) {}
+        //while(c.isOpen) {} FIXME
 
         assertThat(File(dest.toUri()).readText(), `is`("a"))
     }
@@ -75,7 +75,7 @@ class EdgarClientTest: EdgarTest() {
                 .thenThrow(RuntimeException())
 
         val c  = edgarClient.download("exist/path", dest)
-        while(c.isOpen) {}
+        //while(c.isOpen) {} FIXME
 
         assertThat(dest.toFile().exists(), `is`(false))
     }

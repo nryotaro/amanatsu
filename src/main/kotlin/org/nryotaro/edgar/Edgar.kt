@@ -22,6 +22,10 @@ import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
+import java.time.Duration
+import java.util.concurrent.CountDownLatch
 
 fun main(args: Array<String>) {
     SpringApplication.run(Bootstrap::class.java, *args)
@@ -62,25 +66,18 @@ class EdgarImpl(
 
         val indices: Flux<Index> = indexRepository.retrieve(arguments.date,
                 arguments.destination, arguments.overwrite).flatMapIterable { it.indices }
-        val filingDetails: Flux<FilingDetail>
-                = indices
-                /*
-                .filter{
-            if(
-            it.url != "http://www.sec.gov/Archives/edgar/data/740629/9999999997-17-002782-index.htm"
-                    && it.url != "http://www.sec.gov/Archives/edgar/data/1420522/9999999997-17-002867-index.htm") {
-                true
-            } else {
-                false
-            }
-        }
-        */
-                .flatMap { filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}
 
-        println("hoge")
-        filingDetails.blockLast()
-        println("bar")
-        //filedDocumentService.blockCollect(filingDetails, arguments.destination, arguments.overwrite)
+        val filingDetails: Flux<FilingDetail>
+                = indices.delayElements(Duration.ofMillis(100L)).flatMap {
+            filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}
+
+        val ii = filingDetails.toIterable().toList()
+        log.debug("the number of downloaded indices was ${ii.size}")
+
+        val c = filedDocumentService.collect(Flux.just(*ii.toTypedArray()),
+                arguments.destination, arguments.overwrite).blockLast()
+        //val c = filedDocumentService.collect(filingDetails, arguments.destination, arguments.overwrite).blockLast()
+        println(c)
     }
 
     private fun printHelp() {

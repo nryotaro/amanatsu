@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.io.File
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.concurrent.CountDownLatch
@@ -32,7 +33,6 @@ class Experiment: EdgarTest() {
 
     val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
-    @Test
     fun f() {
 
         val cli = WebClient.create("http://www.sec.gov")
@@ -47,7 +47,7 @@ class Experiment: EdgarTest() {
         //(val companyName: String, val formType: String, val cik: Int, val dateFiled: LocalDate, val url: String)
         val ii = Flux.just(Index("comp", "form", 1,LocalDate.now(), "http://www.sec.gov/Archives/edgar/data/1420522/9999999997-17-002867-index.htm"),
                 Index("comp", "form", 1,LocalDate.now(), "http://www.sec.gov/Archives/edgar/data/740629/9999999997-17-002782-index.htm"))
-        val c  =ii.doOnNext{}.
+        val c  =ii.delayElements(Duration.ofMillis(100000L)).
                 flatMap{
                     //cli.get().uri(it.url).exchange().onErrorResume { Mono.empty() }
                     repository.retrieve(it, ff,false)

@@ -25,7 +25,6 @@ class FilingDetailRetriever(
     val log: Logger = LoggerFactory.getLogger(FilingDetailParser::class.java)
     
     fun retrieve(index: Index, destRoot: File, force: Boolean = false): Flux<FilingDetail> {
-        //log.debug("""retrieve $index""")
         val path =  URL(index.url).path.substringAfter("/")
         val dest = File(destRoot, path)
 
@@ -39,7 +38,9 @@ class FilingDetailRetriever(
     }
 
     private fun retrieve(text: Mono<String>, writer: (String) -> Unit): Flux<FilingDetail> {
-        return text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}.onErrorResume {Mono.just(FilingDetail(null, "", Document("", ""), "", 1) )}
+        return text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}.onErrorResume {
+            Mono.empty()
+        }
     }
 
     private fun readFromLocal(file: File): String {
