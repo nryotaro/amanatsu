@@ -30,17 +30,11 @@ import java.util.function.Function
 class EdgarClientContext {
 
     @Bean fun client(@Value("\${url.root}") edgarRootUrl: String): WebClient {
-        return WebClient.builder().defaultHeader("Connection", "keep-alive").baseUrl(edgarRootUrl).build()
-        /*
-        val conn = ReactorClientHttpConnector()
-        val strategies = ExchangeStrategies.withDefaults()
-
-        return WebClient.builder().exchangeStrategies(strategies).baseUrl(edgarRootUrl)
-                .clientConnector(conn).defaultHeader("Connection", "keep-alive").exchangeFunction {
-            conn.connect(it.method(), it.url(),{a: ClientHttpRequest -> it.writeTo(a, strategies)}).map {
-            }
-        }.build()
-        */
+        return WebClient
+                .builder()
+                .defaultHeader("Connection", "keep-alive")
+                .defaultHeader("Accept-Encoding", "gzip, deflate")
+                .baseUrl(edgarRootUrl).build()
     }
 
 }
@@ -57,7 +51,7 @@ class EdgarClientImpl(
         val client: WebClient,
         @Value("\${url.root}") val edgarRootUrl: String): EdgarClient {
 
-    val log  = LoggerFactory.getLogger(this::class.java)
+    val log = LoggerFactory.getLogger(this::class.java)
 
     override fun getRawResponse(url: String): Mono<ClientResponse> {
        return client.get().uri(url).exchange().timeout(ofSeconds(7L)).retry(3).onErrorResume {
@@ -82,27 +76,31 @@ class EdgarClientImpl(
      */
     override fun download(url: String, path: Path): Mono<Boolean> {
 
+        val chan = FileChannel.open(path, StandardOpenOption.WRITE)
+
+        var failure = false
+
         return client.get().uri(url).exchange().timeout(ofSeconds(7L))
                 .onErrorResume {
                     log.warn("failed to download \"$url\" due to $it")
                     Mono.empty()
-                }
-                .flatMapMany {
+                }.flatMapMany {
                     it.body(BodyExtractors.toDataBuffers())
-                }.then(Mono.just(true))
-                /*
-                doOnNext { chan.write(it.asByteBuffer())}.doOnError {
-            log.error("""Failed to write "$url" to $path""")
-            chan.close()
-            path.toFile().delete()
         }.doOnNext {
-            if(!chan.isOpen){
+            chan.write(it.asByteBuffer())
+        }.doOnError {
+            log.error("""Failed to write "$url" to $path""")
+            if(!failure) {
+                chan.close()
+                path.toFile().delete()
+            }
+            failure = true
+        }.doOnNext {
+            if(chan.isOpen){
                 log.debug("""$url was successfully downloaded""")
                 chan.close()
             }
-        }.then(Mono.just(chan))
-        */
-
+        }.then(Mono.just(!failure))
     }
 
     private fun cutEdgarRootUrl(url: String): String {
