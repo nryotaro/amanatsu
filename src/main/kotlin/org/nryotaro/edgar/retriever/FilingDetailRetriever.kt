@@ -32,8 +32,8 @@ class FilingDetailRetriever(
             retrieve(Mono.just(readFromLocal(dest)), {})
         else
             retrieve(readFromRemote(path), {
-                dest.parentFile.mkdirs();
-                dest.createNewFile();
+                dest.parentFile.mkdirs()
+                dest.createNewFile()
                 dest.writeText(it)})
     }
 
