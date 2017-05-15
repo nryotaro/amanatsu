@@ -86,10 +86,12 @@ class EdgarClientImpl(
                 .onErrorResume {
                     log.warn("failed to download \"$url\" due to $it")
                     Mono.empty()
-                }
+                }.flatMap{it.bodyToMono(Byte::class)}
+                /*
                 .flatMapMany {
                     it.body(BodyExtractors.toDataBuffers())
-                }.then(Mono.just(true))
+                 }   */
+                .then(Mono.just(true))
                 /*
                 doOnNext { chan.write(it.asByteBuffer())}.doOnError {
             log.error("""Failed to write "$url" to $path""")
