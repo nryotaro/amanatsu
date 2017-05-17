@@ -11,7 +11,6 @@
 	<name>edgar-crawler</name>
 	<description>Demo project for Spring Boot</description>
 
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -65,7 +64,7 @@
 		<dependency>
 			<groupId>org.nryotaro</groupId>
 			<artifactId>async-httpcli</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

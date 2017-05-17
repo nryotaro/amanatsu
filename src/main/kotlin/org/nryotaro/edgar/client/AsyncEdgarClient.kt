@@ -1,45 +1,59 @@
 package org.nryotaro.edgar.client
 
+import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.HttpContent
 import io.netty.handler.codec.http.HttpResponse
 import org.nryotaro.edgar.client.HttpResponse as NHttpResponse
 import io.netty.handler.codec.http.LastHttpContent
-import org.nryotaro.handler.CliHandler
 import org.nryotaro.httpcli.HttpCli
+import org.nryotaro.httpcli.handler.CliHandler
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 
 class AsyncEdgarClient {
-   val cli = HttpCli()
+    val cli = HttpCli()
 
-    /*
-   fun getResponse(url: String):  NHttpResponse {
-      cli.get(url, object: CliHandler {
+    fun get(url: String) {
+       //getResponse(url).reduce { Pair<Int?, ByteArray?>(), {a, b -> } }
+    }
 
-         override fun acceptHttpResponse(response: HttpResponse) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-         }
+    fun getResponse(url: String): Flux<NHttpResponse> {
 
-         override fun acceptLastHttpContent(msg: LastHttpContent) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-         }
+        return Flux.generate<NHttpResponse> {
+            cli.get(url, object : CliHandler {
 
-         override fun onException(ctx: ChannelHandlerContext, cause: Throwable) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-         }
+                override fun acceptHttpResponse(response: HttpResponse) {
+                    it.next(Status(response.status().code()))
+                }
 
-         override fun onFailure(cause: Throwable) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-         }
+                override fun acceptLastHttpContent(msg: LastHttpContent) {
+                    it.next(HttpContent(toBytes(msg.content())))
+                    it.complete()
+                }
 
-         override fun acceptContent(msg: HttpContent) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-         }
+                private fun toBytes(buf: ByteBuf): ByteArray {
+                    val length = buf.readableBytes()
+                    val array: ByteArray = ByteArray(length)
+                    buf.getBytes(buf.readerIndex(), array)
+                    return array
+                }
+                override fun onException(cause: Throwable) {
+                    it.error(cause)
+                }
 
-      })
-     */
+                override fun onFailure(cause: Throwable) {
+                    it.error(cause)
+                }
 
-   }
+                override fun acceptContent(msg: HttpContent) {
+                    it.next(HttpContent(toBytes(msg.content())))
+                }
+            })
+        }
+
+    }
 
     //HttpResponse(val statusCode: Mono<Int>, val content: Flux<ByteArray>)
     /*

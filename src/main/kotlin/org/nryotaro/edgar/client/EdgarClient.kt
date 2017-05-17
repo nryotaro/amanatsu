@@ -15,5 +15,9 @@ interface EdgarClient {
     fun download(url: String, path: Path): Mono<Boolean>
 }
 
-data class HttpResponse(val statusCode: Mono<Int>, val content: Flux<ByteArray>)
+interface HttpResponse
+
+data class Status(val status: Int): HttpResponse
+
+data class HttpContent(val content: ByteArray): HttpResponse
 
