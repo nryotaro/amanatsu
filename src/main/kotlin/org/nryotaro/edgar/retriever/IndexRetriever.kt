@@ -1,5 +1,6 @@
 package org.nryotaro.edgar.retriever
 
+import io.netty.handler.codec.http.HttpResponseStatus
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.index.Indices
 import org.nryotaro.edgar.text.IndexParser

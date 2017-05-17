@@ -1,6 +1,7 @@
 package org.nryotaro.edgar
 
 import io.netty.channel.EventLoopGroup
+import org.junit.Ignore
 import org.junit.Test
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
@@ -35,7 +36,8 @@ class Experiment: EdgarTest() {
 
     val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
-    fun f() {
-
+    @Ignore
+    @Test
+    fun exec() {
     }
 }
