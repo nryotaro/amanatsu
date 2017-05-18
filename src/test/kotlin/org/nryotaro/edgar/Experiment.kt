@@ -3,6 +3,7 @@ package org.nryotaro.edgar
 import io.netty.channel.EventLoopGroup
 import org.junit.Ignore
 import org.junit.Test
+import org.nryotaro.edgar.annotation.qualifier.MainRunner
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
 import org.nryotaro.edgar.plain.index.Index
@@ -26,18 +27,14 @@ class Experiment: EdgarTest() {
 
 
     @Autowired
-    lateinit var edgar: EdgarClient
+    @MainRunner
+    lateinit var edgar: Edgar
 
-    @Autowired
-    lateinit var indexRetriever: IndexRetriever
-
-    @Autowired
-    lateinit var repository: FilingDetailRetriever
-
-    val log: Logger = LoggerFactory.getLogger(this.javaClass)
-
-    @Ignore
     @Test
     fun exec() {
+
+        val dest: File = createTempDir()
+        println(dest)
+        edgar.execute("-f", "-d", "2017-03-14", "-o", dest.absolutePath)
     }
 }

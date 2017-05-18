@@ -5,6 +5,7 @@ import io.netty.handler.codec.http.HttpResponse
 import io.netty.handler.codec.http.LastHttpContent
 import org.nryotaro.httpcli.HttpCli
 import org.nryotaro.httpcli.handler.CliHandler
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -12,7 +13,7 @@ import org.nryotaro.edgar.client.PartialHttpResponse as PHttpResponse
 import io.netty.handler.codec.http.HttpContent as NettyHttpContent
 
 @Repository
-class AsyncEdgarClient: EdgarClient {
+class AsyncEdgarClient(@Value("\${url.root}") private val edgarRoot: String): EdgarClient {
     val cli = HttpCli()
 
     override  fun get(url: String): Mono<FullHttpResponse> {
@@ -26,9 +27,10 @@ class AsyncEdgarClient: EdgarClient {
     }
 
     override fun getResponse(url: String): Flux<PHttpResponse> {
+        val path = if(url.startsWith(edgarRoot)) url else edgarRoot + url
 
         return Flux.create<PHttpResponse> {
-            cli.get(url, object : CliHandler {
+            cli.get(path, object : CliHandler {
                 override fun acceptContent(msg: NettyHttpContent) {
                     it.next(PartialHttpContent(toBytes(msg.content())))
                 }

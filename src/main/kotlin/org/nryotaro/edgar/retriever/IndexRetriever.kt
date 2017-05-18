@@ -45,7 +45,7 @@ class IndexRetriever(
         return client.get(path).map {
             when(it.status) {
                 200 -> String(it.content)
-                else -> TODO("unsupported status ${it.status}")
+                else -> TODO("unsupported status ${it.status}") //FIXME print messages (handle 429)
             }
         }
     }
