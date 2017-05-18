@@ -1,35 +1,42 @@
 package org.nryotaro.edgar.client
 
 import io.netty.buffer.ByteBuf
-import io.netty.channel.ChannelHandlerContext
-import io.netty.handler.codec.http.HttpContent
 import io.netty.handler.codec.http.HttpResponse
-import org.nryotaro.edgar.client.HttpResponse as NHttpResponse
 import io.netty.handler.codec.http.LastHttpContent
 import org.nryotaro.httpcli.HttpCli
 import org.nryotaro.httpcli.handler.CliHandler
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-
+import org.nryotaro.edgar.client.PartialHttpResponse as PHttpResponse
+import io.netty.handler.codec.http.HttpContent as NettyHttpContent
 
 class AsyncEdgarClient {
     val cli = HttpCli()
 
-    fun get(url: String) {
-       //getResponse(url).reduce { Pair<Int?, ByteArray?>(), {a, b -> } }
+    fun get(url: String): Mono<FullHttpResponse> {
+         return getResponse(url).reduce (
+                Pair<Int, ByteArray>(-1, ByteArray(0)), { (first, second), b ->
+            when(b) {
+                is Status -> Pair(b.status, second)
+                is PartialHttpContent -> Pair(first, byteArrayOf(*second,*b.content))
+            }
+        }).map { FullHttpResponse(it.first, it.second) }
     }
 
-    fun getResponse(url: String): Flux<NHttpResponse> {
+    fun getResponse(url: String): Flux<PHttpResponse> {
 
-        return Flux.generate<NHttpResponse> {
+        return Flux.create<PHttpResponse> {
             cli.get(url, object : CliHandler {
+                override fun acceptContent(msg: NettyHttpContent) {
+                    it.next(PartialHttpContent(toBytes(msg.content())))
+                }
 
                 override fun acceptHttpResponse(response: HttpResponse) {
                     it.next(Status(response.status().code()))
                 }
 
                 override fun acceptLastHttpContent(msg: LastHttpContent) {
-                    it.next(HttpContent(toBytes(msg.content())))
+                    it.next(PartialHttpContent(toBytes(msg.content())))
                     it.complete()
                 }
 
@@ -46,21 +53,8 @@ class AsyncEdgarClient {
                 override fun onFailure(cause: Throwable) {
                     it.error(cause)
                 }
-
-                override fun acceptContent(msg: HttpContent) {
-                    it.next(HttpContent(toBytes(msg.content())))
-                }
             })
         }
 
     }
-
-    //HttpResponse(val statusCode: Mono<Int>, val content: Flux<ByteArray>)
-    /*
-    fun getRawResponse(url: String): Mono<ClientResponse>
-
-    fun get(url: String): Mono<String>
-
-    fun download(url: String, path: Path): Mono<Boolean>
-    */
 }

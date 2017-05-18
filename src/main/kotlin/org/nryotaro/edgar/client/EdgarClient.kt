@@ -15,9 +15,13 @@ interface EdgarClient {
     fun download(url: String, path: Path): Mono<Boolean>
 }
 
-interface HttpResponse
+sealed class PartialHttpResponse
 
-data class Status(val status: Int): HttpResponse
+data class Status(val status: Int): PartialHttpResponse()
 
-data class HttpContent(val content: ByteArray): HttpResponse
+data class PartialHttpContent(val content: ByteArray): PartialHttpResponse()
+
+data class FullHttpResponse(val status: Int, val content: ByteArray)
+
+
 
