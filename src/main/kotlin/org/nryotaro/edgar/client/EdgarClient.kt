@@ -8,11 +8,17 @@ import java.nio.file.Path
 
 interface EdgarClient {
 
+    /*
     fun getRawResponse(url: String): Mono<ClientResponse>
 
     fun get(url: String): Mono<String>
 
     fun download(url: String, path: Path): Mono<Boolean>
+    */
+
+    fun getResponse(url: String): Flux<PartialHttpResponse>
+
+    fun get(url: String): Mono<FullHttpResponse>
 }
 
 sealed class PartialHttpResponse
