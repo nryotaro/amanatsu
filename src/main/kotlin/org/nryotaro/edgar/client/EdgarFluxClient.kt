@@ -32,18 +32,18 @@ class EdgarClientContext {
 @Service
 class EdgarFluxClient(
         val client: WebClient,
-        @Value("\${url.root}") val edgarRootUrl: String): EdgarClient {
+        @Value("\${url.root}") val edgarRootUrl: String){
 
     val log = LoggerFactory.getLogger(this::class.java)
 
-    override fun getRawResponse(url: String): Mono<ClientResponse> {
+     fun getRawResponse(url: String): Mono<ClientResponse> {
        return client.get().uri(url).exchange().timeout(ofSeconds(7L)).retry(3).onErrorResume {
            log.warn("failed to get \"$url\" caused by $it")
            Mono.empty()
        }
     }
 
-    override fun get(url: String): Mono<String> {
+     fun get(url: String): Mono<String> {
         return Mono.just(url).delayElement(ofMillis(100L)).flatMap {
             client.get().uri(it).exchange().timeout(ofSeconds(7L)).onErrorResume {
                 log.warn("failed to get \"$url\" caused by $it")
@@ -57,7 +57,7 @@ class EdgarFluxClient(
     /**
      * TODO Path -> file
      */
-    override fun download(url: String, path: Path): Mono<Boolean> {
+     fun download(url: String, path: Path): Mono<Boolean> {
 
         val chan = FileChannel.open(path, StandardOpenOption.WRITE)
 

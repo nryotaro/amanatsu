@@ -6,6 +6,7 @@ import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.nryotaro.edgar.EdgarTest
 import org.nryotaro.edgar.client.EdgarClient
+import org.nryotaro.edgar.client.FullHttpResponse
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
 import org.nryotaro.edgar.plain.index.Index
 import org.slf4j.LoggerFactory
@@ -30,8 +31,10 @@ class FilingDetailRetrieverTest : EdgarTest() {
     fun retrieve() {
         val path = "Archives/edgar/data/34782/0000034782-17-000039-index.htm"
         val url = "http://www.sec.gov/" + path
+
+        val text: String = readTextFile("0001209191-17-028829-index.htm", FilingDetailRetrieverTest::class)
         `when`(client.get(path)).thenReturn(
-                Mono.just(readTextFile("0001209191-17-028829-index.htm", FilingDetailRetrieverTest::class)))
+                Mono.just(FullHttpResponse(200, text.toByteArray())))
 
         val destRoot = createTempDir()
         log.debug("$destRoot")

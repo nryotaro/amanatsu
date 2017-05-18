@@ -42,16 +42,11 @@ class IndexRetriever(
     }
 
     private fun readFromRemote(path: String): Mono<String> {
-        return client.getRawResponse(path).flatMap {
-              when(it.statusCode().series()) {
-                 INFORMATIONAL -> TODO("information")
-                 SUCCESSFUL -> it.bodyToMono(String::class.java)
-                 REDIRECTION -> TODO("redirection")
-                 CLIENT_ERROR -> {
-                     log.info(""""$path" doesn't exist""")
-                     Mono.empty()}
-                 SERVER_ERROR -> TODO("server error")
-             }
+        return client.get(path).map {
+            when(it.status) {
+                200 -> String(it.content)
+                else -> TODO("unsupported status ${it.status}")
+            }
         }
     }
     private fun readFromLocal(file: File): String {

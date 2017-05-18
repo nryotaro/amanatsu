@@ -47,6 +47,6 @@ class FilingDetailRetriever(
         return file.readText()
     }
     private fun readFromRemote(url: String): Mono<String> {
-        return client.get(url)
+        return client.get(url).map { String(it.content) }
     }
 }
