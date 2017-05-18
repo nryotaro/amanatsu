@@ -5,15 +5,17 @@ import io.netty.handler.codec.http.HttpResponse
 import io.netty.handler.codec.http.LastHttpContent
 import org.nryotaro.httpcli.HttpCli
 import org.nryotaro.httpcli.handler.CliHandler
+import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import org.nryotaro.edgar.client.PartialHttpResponse as PHttpResponse
 import io.netty.handler.codec.http.HttpContent as NettyHttpContent
 
-class AsyncEdgarClient {
+@Repository
+class AsyncEdgarClient: EdgarClient {
     val cli = HttpCli()
 
-    fun get(url: String): Mono<FullHttpResponse> {
+    override  fun get(url: String): Mono<FullHttpResponse> {
          return getResponse(url).reduce (
                 Pair<Int, ByteArray>(-1, ByteArray(0)), { (first, second), b ->
             when(b) {
@@ -23,7 +25,7 @@ class AsyncEdgarClient {
         }).map { FullHttpResponse(it.first, it.second) }
     }
 
-    fun getResponse(url: String): Flux<PHttpResponse> {
+    override fun getResponse(url: String): Flux<PHttpResponse> {
 
         return Flux.create<PHttpResponse> {
             cli.get(url, object : CliHandler {
