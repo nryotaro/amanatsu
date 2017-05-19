@@ -1,22 +1,16 @@
 package org.nryotaro.edgar.retriever
 
-import io.netty.handler.codec.http.HttpResponseStatus
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.plain.index.Indices
 import org.nryotaro.edgar.text.IndexParser
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus.Series.INFORMATIONAL
-import org.springframework.http.HttpStatus.Series.SUCCESSFUL
-import org.springframework.http.HttpStatus.Series.REDIRECTION
-import org.springframework.http.HttpStatus.Series.SERVER_ERROR
-import org.springframework.http.HttpStatus.Series.CLIENT_ERROR
 import org.springframework.stereotype.Component
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import reactor.core.publisher.Mono
 import java.io.File
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 @Component
@@ -42,10 +36,13 @@ class IndexRetriever(
     }
 
     private fun readFromRemote(path: String): Mono<String> {
-        return client.get(path).map {
+        return client.get(path).flatMap {
             when(it.status) {
-                200 -> String(it.content)
-                else -> TODO("unsupported status ${it.status}") //FIXME print messages (handle 429)
+                200 -> Mono.just(String(it.content))
+                else -> {
+                    log.error("Unexpected response: ${String(it.content)}")
+                    Mono.empty()
+                }
             }
         }
     }
