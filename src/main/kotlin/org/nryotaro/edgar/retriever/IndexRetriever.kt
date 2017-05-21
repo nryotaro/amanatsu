@@ -36,7 +36,6 @@ class IndexRetriever(
     private fun retrieve(date: LocalDate, writer: (String) -> Unit): Mono<Indices> {
         return Mono.just(buildIndex(date)).delayElement(Duration.ofMillis(trafficLimit))
                 .flatMap{readFromRemote(it)}.doOnNext(writer).flatMap { Mono.just(parser.parse(it))}
-        //return readFromRemote(buildIndex(date)).doOnNext(writer).flatMap { Mono.just(parser.parse(it))}
     }
 
     private fun retrieve(localDest: File, writer: (String) -> Unit): Mono<Indices> {

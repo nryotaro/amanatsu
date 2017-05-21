@@ -1,6 +1,7 @@
 package org.nryotaro.edgar.retriever
 
 import org.nryotaro.edgar.client.EdgarClient
+import org.nryotaro.edgar.exception.EdgarException
 import org.nryotaro.edgar.plain.filingdetail.Document
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
 import org.nryotaro.edgar.plain.index.Index
@@ -20,6 +21,7 @@ import java.time.Duration
 
 @Repository
 class FilingDetailRetriever(
+        @Value("\${edgar.traffic.limit}") private val trafficLimit: Long,
         private val client: EdgarClient,
         private val filingDetailParser: FilingDetailParser) {
 
@@ -39,16 +41,23 @@ class FilingDetailRetriever(
     }
 
     private fun retrieve(text: Mono<String>, writer: (String) -> Unit): Flux<FilingDetail> {
+        return text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}
+        /*
         return text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}.onErrorResume {
             Mono.empty()
         }
+        */
     }
 
     private fun readFromLocal(file: File): String {
         return file.readText()
     }
     private fun readFromRemote(url: String): Mono<String> {
-        // TODO delay param
-        return client.get(url).delayElement(Duration.ofMillis(200L)).map { String(it.content) }
+        return client.get(url).delayElement(Duration.ofMillis(trafficLimit)).map {
+            when(it.status) {
+                200 -> String(it.content)
+                else -> throw EdgarException("failed to download ${url}")
+            }
+        }
     }
 }
