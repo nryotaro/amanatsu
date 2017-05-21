@@ -7,3 +7,7 @@ url:
   root: https://www.sec.gov/
   dailyindex: Archives/edgar/daily-index/
 
+edgar:
+  traffic:
+    limit: 200
+

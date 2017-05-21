@@ -7,8 +7,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.io.File
+import java.time.Duration
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -17,18 +19,24 @@ import java.time.format.DateTimeFormatter
 class IndexRetriever(
         private val client: EdgarClient,
         @Value("\${url.dailyindex}") private val dailyIndex: String,
+        @Value("\${edgar.traffic.limit}") private val trafficLimit: Long,
         private val parser: IndexParser) {
 
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun retrieve(date: LocalDate, destRoot: File, force: Boolean = false): Mono<Indices> {
         val dest = File(destRoot, buildIndex(date))
-        return if(!force && dest.exists() && dest.isFile) retrieve(dest, {})
-        else retrieve(date, {dest.parentFile.mkdirs(); dest.createNewFile(); dest.writeText(it)})
+        return if(!force && dest.exists() && dest.isFile)  {
+            retrieve(dest, {})
+        } else {
+            retrieve(date, {dest.parentFile.mkdirs(); dest.createNewFile(); dest.writeText(it)})
+        }
     }
 
     private fun retrieve(date: LocalDate, writer: (String) -> Unit): Mono<Indices> {
-        return readFromRemote(buildIndex(date)).doOnNext(writer).flatMap { Mono.just(parser.parse(it))}
+        return Mono.just(buildIndex(date)).delayElement(Duration.ofMillis(trafficLimit))
+                .flatMap{readFromRemote(it)}.doOnNext(writer).flatMap { Mono.just(parser.parse(it))}
+        //return readFromRemote(buildIndex(date)).doOnNext(writer).flatMap { Mono.just(parser.parse(it))}
     }
 
     private fun retrieve(localDest: File, writer: (String) -> Unit): Mono<Indices> {
@@ -36,7 +44,7 @@ class IndexRetriever(
     }
 
     private fun readFromRemote(path: String): Mono<String> {
-        return client.get(path).flatMap {
+        return client.get(path).delayElement(Duration.ofMillis(trafficLimit)).flatMap {
             when(it.status) {
                 200 -> Mono.just(String(it.content))
                 429 -> {log.error("Exceeded the SEC’s Traffic Limit: ${String(it.content)}"); Mono.empty()}

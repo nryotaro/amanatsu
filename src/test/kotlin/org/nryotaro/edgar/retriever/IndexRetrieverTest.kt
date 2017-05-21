@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpStatus
 import org.springframework.web.reactive.function.client.ClientResponse
 import reactor.core.publisher.Mono
+import reactor.test.StepVerifier
 import java.io.File
 import java.time.LocalDate
 
@@ -94,5 +95,17 @@ class IndexRetrieverTest : EdgarTest() {
                         "http://www.sec.gov/Archives/edgar/data/34782/0000034782-17-000039-index.htm"))))
         assertThat(File(dest, "Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx").exists(), `is`(true))
         verify(client, times(1)).get(anyString())
+    }
+
+    @Test
+    fun failure() {
+        val dest = createTempDir()
+
+        `when`(client.get("Archives/edgar/daily-index/2017/QTR1/crawler.20170314.idx"))
+                .thenReturn(Mono.just(FullHttpResponse(429, readTextFile("traffic_limit.html", this::class).toByteArray())))
+
+        StepVerifier
+                .create(indexRepository.retrieve(LocalDate.parse("2017-03-14"), dest, true))
+                .expectComplete().verify()
     }
 }
