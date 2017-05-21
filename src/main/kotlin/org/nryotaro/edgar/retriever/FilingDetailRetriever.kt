@@ -16,6 +16,7 @@ import java.io.File
 import java.net.URI
 import java.net.URL
 import java.nio.ByteBuffer
+import java.time.Duration
 
 @Repository
 class FilingDetailRetriever(
@@ -47,6 +48,6 @@ class FilingDetailRetriever(
         return file.readText()
     }
     private fun readFromRemote(url: String): Mono<String> {
-        return client.get(url).map { String(it.content) }
+        return client.get(url).delayElement(Duration.ofMillis(200L)).map { String(it.content) }
     }
 }

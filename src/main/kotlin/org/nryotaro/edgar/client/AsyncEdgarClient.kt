@@ -3,7 +3,7 @@ package org.nryotaro.edgar.client
 import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.http.HttpResponse
 import io.netty.handler.codec.http.LastHttpContent
-import org.nryotaro.httpcli.HttpCli
+import org.nryotaro.httpcli.client.HttpCli
 import org.nryotaro.httpcli.handler.CliHandler
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
@@ -45,10 +45,20 @@ class AsyncEdgarClient(@Value("\${url.root}") private val edgarRoot: String): Ed
                 }
 
                 private fun toBytes(buf: ByteBuf): ByteArray {
+                    if(buf.isDirect) {
+                        val length = buf.readableBytes()
+                        val array = ByteArray(length)
+                        buf.getBytes(buf.readerIndex(), array)
+                        return array;
+                    }
+                    val array = buf.array()
+                    val offset = buf.arrayOffset() + buf.readerIndex()
                     val length = buf.readableBytes()
-                    val array: ByteArray = ByteArray(length)
-                    buf.getBytes(buf.readerIndex(), array)
-                    return array
+                    val res = ByteArray(length)
+                    for (i in 0 until length) {
+                        res[i] = array[i+offset]
+                    }
+                    return res;
                 }
                 override fun onException(cause: Throwable) {
                     it.error(cause)
