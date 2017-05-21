@@ -48,6 +48,7 @@ class FilingDetailRetriever(
         return file.readText()
     }
     private fun readFromRemote(url: String): Mono<String> {
+        // TODO delay param
         return client.get(url).delayElement(Duration.ofMillis(200L)).map { String(it.content) }
     }
 }

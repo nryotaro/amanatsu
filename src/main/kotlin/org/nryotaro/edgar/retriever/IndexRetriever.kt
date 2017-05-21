@@ -39,10 +39,8 @@ class IndexRetriever(
         return client.get(path).flatMap {
             when(it.status) {
                 200 -> Mono.just(String(it.content))
-                else -> {
-                    log.error("Unexpected response: ${String(it.content)}")
-                    Mono.empty()
-                }
+                429 -> {log.error("Exceeded the SEC’s Traffic Limit: ${String(it.content)}"); Mono.empty()}
+                else -> {log.error("Unexpected response: ${String(it.content)}"); Mono.empty()}
             }
         }
     }
