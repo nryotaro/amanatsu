@@ -63,13 +63,16 @@ class EdgarImpl(
 
         val filingDetails: Flux<FilingDetail>
                 = indices.flatMap {
-            filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}
+            filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}.doOnError {
+            log.error("Error(${it}) occurred.")
+            Flux.empty<FilingDetail>()
+        }
 
-        val ii = filingDetails.toIterable().toList().filter { it.document.url !=""}
-        log.debug("the number of downloaded indices was ${ii.size}")
-
-        filedDocumentService.collect(Flux.just(*ii.toTypedArray()),
-                arguments.destination, arguments.overwrite).blockLast()
+        filedDocumentService.collect(filingDetails, arguments.destination, arguments.overwrite)
+                .doOnError {
+                    log.error("Error(${it}) occurred.")
+                }
+                .blockLast()
     }
 
     private fun printHelp() {

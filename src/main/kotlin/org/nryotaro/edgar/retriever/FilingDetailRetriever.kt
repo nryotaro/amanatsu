@@ -2,11 +2,9 @@ package org.nryotaro.edgar.retriever
 
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.exception.EdgarException
-import org.nryotaro.edgar.plain.filingdetail.Document
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
 import org.nryotaro.edgar.plain.index.Index
 import org.nryotaro.edgar.text.FilingDetailParser
-import org.reactivestreams.Publisher
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -14,9 +12,7 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.io.File
-import java.net.URI
 import java.net.URL
-import java.nio.ByteBuffer
 import java.time.Duration
 
 @Repository
@@ -42,11 +38,6 @@ class FilingDetailRetriever(
 
     private fun retrieve(text: Mono<String>, writer: (String) -> Unit): Flux<FilingDetail> {
         return text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}
-        /*
-        return text.doOnNext(writer).flatMapIterable { filingDetailParser.parse(it)}.onErrorResume {
-            Mono.empty()
-        }
-        */
     }
 
     private fun readFromLocal(file: File): String {
