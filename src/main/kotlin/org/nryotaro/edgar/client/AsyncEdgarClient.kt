@@ -36,6 +36,10 @@ class AsyncEdgarClient(@Value("\${url.root}") private val edgarRoot: String,
         }).map { FullHttpResponse(it.first, it.second) }
     }
 
+    fun getResponse(url: String, retry: Int): Flux<PHttpResponse> {
+        TODO("retry")
+    }
+
     override fun getResponse(url: String): Flux<PHttpResponse> {
         val path = if(url.startsWith(edgarRoot)) url else edgarRoot + url
 

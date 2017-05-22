@@ -7,6 +7,7 @@ import org.nryotaro.edgar.EdgarTest
 
 class AsyncEdgarClientTest: EdgarTest() {
 
+
     @Test
     fun test() {
 
