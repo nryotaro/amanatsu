@@ -4,10 +4,12 @@ import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.nryotaro.edgar.EdgarTest
 import org.nryotaro.edgar.client.EdgarClient
+import org.nryotaro.edgar.exception.EdgarException
 import org.nryotaro.edgar.retriever.FiledDocumentRetriever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import reactor.core.publisher.Flux
+import java.time.Duration
 
 class FiledDocumentRetrieverTest : EdgarTest() {
 
@@ -24,8 +26,17 @@ class FiledDocumentRetrieverTest : EdgarTest() {
     @Test
     fun retrieve(){
 
-        //`when`(client.getResponse("any")).thenReturn(Flux.just())
-        //filedDocumentRetriever.retrieve("any", createTempFile())
+        /*
+        Flux.interval(Duration.ofMillis(250))
+                .map( { input ->
+                    println(input)
+            if (input < 3)
+                "tick " + input
+                    else {
+                throw RuntimeException("boom");
+            }
+        }).retry {println("retry"); true }.blockLast()
+        */
 
     }
 }

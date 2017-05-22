@@ -29,7 +29,7 @@ class FiledDocumentRetriever(
         val destination = FileChannel.open(dest.toPath(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
 
         return Mono.just(documentUrl).delayElement(Duration.ofMillis(trafficLimit))
-                .flatMapMany{client.getResponse(it) }.reduce(true, {success ,b ->
+                .flatMapMany{ client.getResponse(it) }.reduce(true, {success ,b ->
             when(success) {
                 false -> false
                 true -> when(b) {

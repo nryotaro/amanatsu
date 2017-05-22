@@ -2,6 +2,7 @@ package org.nryotaro.edgar
 
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.ParseException
+import org.nryotaro.edgar.client.AsyncClientConfig
 import org.nryotaro.edgar.client.EdgarClientContext
 import org.nryotaro.edgar.cmdparser.CmdParser
 import org.nryotaro.edgar.cmdparser.CommandContext
@@ -26,8 +27,8 @@ fun main(args: Array<String>) {
 }
 
 @SpringBootApplication
-@Import(CommandContext::class, EdgarClientContext::class)
-open class Bootstrap(val edgar: Edgar, val parser: CmdParser) : CommandLineRunner {
+@Import(CommandContext::class, AsyncClientConfig::class)
+open class Bootstrap(val edgar: Edgar) : CommandLineRunner {
 
     override fun run(vararg args: String) {
         edgar.execute(*args)

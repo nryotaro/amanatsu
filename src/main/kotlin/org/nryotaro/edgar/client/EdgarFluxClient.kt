@@ -29,7 +29,7 @@ class EdgarClientContext {
     }
 
 }
-@Service
+
 class EdgarFluxClient(
         val client: WebClient,
         @Value("\${url.root}") val edgarRootUrl: String){

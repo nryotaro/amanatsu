@@ -5,17 +5,27 @@ import io.netty.handler.codec.http.HttpResponse
 import io.netty.handler.codec.http.LastHttpContent
 import org.nryotaro.httpcli.client.HttpCli
 import org.nryotaro.httpcli.handler.CliHandler
+import org.springframework.beans.factory.annotation.Configurable
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import org.nryotaro.edgar.client.PartialHttpResponse as PHttpResponse
 import io.netty.handler.codec.http.HttpContent as NettyHttpContent
 
-@Repository
-class AsyncEdgarClient(@Value("\${url.root}") private val edgarRoot: String): EdgarClient {
-    val cli = HttpCli()
+@Configurable
+class AsyncClientConfig {
 
+    @Bean
+    fun httpCli(): HttpCli {
+        return HttpCli()
+    }
+}
+
+@Repository
+class AsyncEdgarClient(@Value("\${url.root}") private val edgarRoot: String,
+                       private val cli: HttpCli): EdgarClient {
     override  fun get(url: String): Mono<FullHttpResponse> {
          return getResponse(url).reduce (
                 Pair<Int, ByteArray>(-1, ByteArray(0)), { (first, second), b ->
@@ -69,6 +79,5 @@ class AsyncEdgarClient(@Value("\${url.root}") private val edgarRoot: String): Ed
                 }
             })
         }
-
     }
 }
