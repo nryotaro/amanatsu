@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import org.nryotaro.edgar.client.PartialHttpResponse as PHttpResponse
+import org.nryotaro.edgar.client.LastHttpContent as PLastHttpContent
 import io.netty.handler.codec.http.HttpContent as NettyHttpContent
 
 @Configurable
@@ -32,12 +33,9 @@ class AsyncEdgarClient(@Value("\${url.root}") private val edgarRoot: String,
             when(b) {
                 is Status -> Pair(b.status, second)
                 is PartialHttpContent -> Pair(first, byteArrayOf(*second,*b.content))
+                is PLastHttpContent -> Pair(first, byteArrayOf(*second,*b.content))
             }
         }).map { FullHttpResponse(it.first, it.second) }
-    }
-
-    fun getResponse(url: String, retry: Int): Flux<PHttpResponse> {
-        TODO("retry")
     }
 
     override fun getResponse(url: String): Flux<PHttpResponse> {
@@ -54,7 +52,7 @@ class AsyncEdgarClient(@Value("\${url.root}") private val edgarRoot: String,
                 }
 
                 override fun acceptLastHttpContent(msg: LastHttpContent) {
-                    it.next(PartialHttpContent(toBytes(msg.content())))
+                    it.next(PLastHttpContent(toBytes(msg.content())))
                     it.complete()
                 }
 

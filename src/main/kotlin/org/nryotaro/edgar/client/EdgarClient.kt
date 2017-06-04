@@ -27,6 +27,8 @@ data class Status(val status: Int): PartialHttpResponse()
 
 data class PartialHttpContent(val content: ByteArray): PartialHttpResponse()
 
+data class LastHttpContent(val content: ByteArray): PartialHttpResponse()
+
 data class FullHttpResponse(val status: Int, val content: ByteArray)
 
 

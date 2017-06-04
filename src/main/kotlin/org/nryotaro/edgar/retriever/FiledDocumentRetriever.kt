@@ -1,9 +1,6 @@
 package org.nryotaro.edgar.retriever
 
-import org.nryotaro.edgar.client.EdgarClient
-import org.nryotaro.edgar.client.PartialHttpContent
-import org.nryotaro.edgar.client.PartialHttpResponse
-import org.nryotaro.edgar.client.Status
+import org.nryotaro.edgar.client.*
 import org.nryotaro.edgar.exception.EdgarException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -46,11 +43,17 @@ class FiledDocumentRetriever(
                         destination.write(c)
                         true
                     }
-                }}}).doOnNext {
-            log.debug("downloaded: ${documentUrl}")
+                    is LastHttpContent -> {
+                        val c: ByteBuffer = ByteBuffer.allocate(b.content.size)
+                        c.put(b.content)
+                        c.flip()
+                        destination.write(c)
+                        destination.close()
+                        true
+                    }
+                }}}).doOnNext{log.debug("downloaded $documentUrl")}.doOnError {
             destination.close()
-        }.doOnError {
-            destination.close()
+            dest.delete()
             throw EdgarException("failed to download correctly: ${dest}")
         }
     }
