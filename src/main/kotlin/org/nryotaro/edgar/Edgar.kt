@@ -67,6 +67,7 @@ class EdgarImpl(
         val filingDetails: Flux<FilingDetail>
                 = filingDetailService.retrieve(indices, arguments.destination, arguments.overwrite)
 
+
         filedDocumentService.collect(filingDetails, arguments.destination, arguments.overwrite)
                 .doOnError {
                     log.error("Error(${it}) occurred.")

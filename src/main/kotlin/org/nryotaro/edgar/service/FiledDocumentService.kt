@@ -20,7 +20,7 @@ class FiledDocumentService(private val retriever: FiledDocumentRetriever,
     val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     fun collect(details: Flux<FilingDetail>, destRoot: File, force: Boolean = false): Flux<Boolean> {
-        return details.doOnNext { log.debug("""download: ${it.document.url}""") }.delayElements(Duration.ofMillis(trafficLimit),
+        return details.distinct { it.document.url }.doOnNext { log.debug("""download: ${it.document.url}""") }.delayElements(Duration.ofMillis(trafficLimit),
                 Schedulers.single())
                 .map { Pair(it.document.url, File(destRoot, it.document.url)) }
                 .filter { force || !it.second.exists() }.flatMap {
