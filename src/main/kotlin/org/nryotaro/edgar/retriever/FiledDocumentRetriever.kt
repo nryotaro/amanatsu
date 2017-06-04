@@ -23,7 +23,7 @@ class FiledDocumentRetriever(
      */
     fun retrieve(documentUrl: String, dest: File): Mono<Boolean> {
         dest.parentFile.mkdirs()
-        val destination = FileChannel.open(dest.toPath(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
+        var destination = FileChannel.open(dest.toPath(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
 
         return Mono.just(documentUrl).delayElement(Duration.ofMillis(trafficLimit))
                 .flatMapMany{ client.getResponse(it) }.reduce(true, {success ,b ->
@@ -51,10 +51,15 @@ class FiledDocumentRetriever(
                         destination.close()
                         true
                     }
-                }}}).doOnNext{log.debug("downloaded $documentUrl")}.doOnError {
+                }}}).doOnError {
+            log.debug("$it occurred.")
+            dest.delete()
+            destination = FileChannel.open(dest.toPath(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
+        }.retry(3).doOnNext{log.debug("downloaded $documentUrl")}.onErrorResume {
             destination.close()
             dest.delete()
-            throw EdgarException("failed to download correctly: ${dest}")
+            log.error("failed to download correctly: ${documentUrl}")
+            Mono.just(false)
         }
     }
 }
