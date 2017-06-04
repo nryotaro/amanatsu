@@ -1,6 +1,8 @@
 package org.nryotaro.edgar.exception
 
-class EdgarException: RuntimeException {
+
+
+open class EdgarException: RuntimeException {
 
     constructor(): super()
 
@@ -10,4 +12,8 @@ class EdgarException: RuntimeException {
 
     constructor(message: String, cause: Throwable, enableSuppression: Boolean, writableStackTrace: Boolean)
             : super(message, cause, enableSuppression, writableStackTrace)
+
 }
+
+class ExceededTrafficLimitException: EdgarException()
+

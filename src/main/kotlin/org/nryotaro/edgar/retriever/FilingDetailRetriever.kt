@@ -2,6 +2,7 @@ package org.nryotaro.edgar.retriever
 
 import org.nryotaro.edgar.client.EdgarClient
 import org.nryotaro.edgar.exception.EdgarException
+import org.nryotaro.edgar.exception.ExceededTrafficLimitException
 import org.nryotaro.edgar.plain.filingdetail.FilingDetail
 import org.nryotaro.edgar.plain.index.Index
 import org.nryotaro.edgar.text.FilingDetailParser
@@ -27,13 +28,22 @@ class FilingDetailRetriever(
         val path =  URL(index.url).path.substringAfter("/")
         val dest = File(destRoot, path)
 
-        return if(!force && dest.exists() && dest.isFile)
-            retrieve(Mono.just(readFromLocal(dest)), {})
-        else
-            retrieve(readFromRemote(path), {
-                dest.parentFile.mkdirs()
-                dest.createNewFile()
-                dest.writeText(it)})
+        val filingDetails =
+                if(!force && dest.exists() && dest.isFile)
+                    retrieve(Mono.just(readFromLocal(dest)), {})
+                else
+                    retrieve(readFromRemote(path), {
+                        dest.parentFile.mkdirs()
+                        dest.createNewFile()
+                        dest.writeText(it)})
+
+
+        return filingDetails.onErrorResume({
+            !(it is ExceededTrafficLimitException)
+        }, {
+            log.warn("$it occurred while parsing $index")
+            Flux.empty()
+        })
     }
 
     private fun retrieve(text: Mono<String>, writer: (String) -> Unit): Flux<FilingDetail> {
@@ -47,6 +57,7 @@ class FilingDetailRetriever(
         return client.get(url).delayElement(Duration.ofMillis(trafficLimit)).map {
             when(it.status) {
                 200 -> String(it.content)
+                429 -> throw ExceededTrafficLimitException()
                 else -> throw EdgarException("failed to download ${url}")
             }
         }
