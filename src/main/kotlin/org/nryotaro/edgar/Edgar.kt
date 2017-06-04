@@ -12,6 +12,7 @@ import org.nryotaro.edgar.plain.index.Index
 import org.nryotaro.edgar.retriever.FilingDetailRetriever
 import org.nryotaro.edgar.retriever.IndexRetriever
 import org.nryotaro.edgar.service.FiledDocumentService
+import org.nryotaro.edgar.service.FilingDetailService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
@@ -47,7 +48,7 @@ class EdgarImpl(
         @Value("\${spring.application.name}") val appName: String,
         private val cmdParser: CmdParser,
         private val indexRepository: IndexRetriever,
-        private val filingDetailRepository: FilingDetailRetriever,
+        private val filingDetailService: FilingDetailService,
         private val filedDocumentService: FiledDocumentService): Edgar {
 
     val log  = LoggerFactory.getLogger(this::class.java)
@@ -62,12 +63,9 @@ class EdgarImpl(
         val indices: Flux<Index> = indexRepository.retrieve(arguments.date,
                 arguments.destination, arguments.overwrite).flatMapIterable { it.indices }
 
+
         val filingDetails: Flux<FilingDetail>
-                = indices.flatMap {
-            filingDetailRepository.retrieve(it, arguments.destination, arguments.overwrite)}.doOnError {
-            log.error("Error(${it}) occurred.")
-            Flux.empty<FilingDetail>()
-        }
+                = filingDetailService.retrieve(indices, arguments.destination, arguments.overwrite)
 
         filedDocumentService.collect(filingDetails, arguments.destination, arguments.overwrite)
                 .doOnError {

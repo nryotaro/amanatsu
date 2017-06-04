@@ -12,6 +12,7 @@ import org.nryotaro.edgar.retriever.FiledDocumentRetriever
 import org.nryotaro.edgar.retriever.FilingDetailRetriever
 import org.nryotaro.edgar.retriever.IndexRetriever
 import org.nryotaro.edgar.service.FiledDocumentService
+import org.nryotaro.edgar.service.FilingDetailService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,10 +56,10 @@ open class EdgarRunnerConfiguration {
             @Value("\${spring.application.name}") appName: String,
             cmdParser: CmdParser,
             indexRepository: IndexRetriever,
-            filingDetailRepository: FilingDetailRetriever,
+            filingDetailService: FilingDetailService,
             filedDocumentService: FiledDocumentService): Edgar {
         return EdgarImpl(appName, cmdParser, indexRepository,
-                filingDetailRepository, filedDocumentService)
+                filingDetailService, filedDocumentService)
     }
 }
 
