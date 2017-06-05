@@ -1,7 +1,9 @@
 package org.nryotaro.edgar.retriever
 
-import org.nryotaro.edgar.client.*
-import org.nryotaro.edgar.exception.EdgarException
+import org.nryotaro.edgar.client.EdgarClient
+import org.nryotaro.edgar.client.LastHttpContent
+import org.nryotaro.edgar.client.PartialHttpContent
+import org.nryotaro.edgar.client.Status
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Repository
@@ -58,7 +60,7 @@ class FiledDocumentRetriever(
         }.retry(3).doOnNext{log.debug("downloaded $documentUrl")}.onErrorResume {
             destination.close()
             dest.delete()
-            log.error("failed to download correctly: ${documentUrl}")
+            log.error("failed to download: $documentUrl.${System.lineSeparator()}{}", it)
             Mono.just(false)
         }
     }
